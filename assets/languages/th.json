@@ -1,0 +1,10 @@
+{
+  "hello": "สวัสดี !",
+  "format": "the ฟอร์แมต {name} is ",
+  "fruits" : {
+    "apple" : "เป้ล"
+  },
+  "appTitle": "ภาษาไทย",
+  "textArea": "ไทย ในไทย ในไทยอีกทีหนึ่ง",
+  "buttonTitle": "เปลี่ยนภาษา"
+}

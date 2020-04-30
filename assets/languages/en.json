@@ -1,0 +1,10 @@
+{
+  "hello": "Hello !",
+  "format": "the format {name} is ",
+  "fruits" : {
+    "apple" : "apple"
+  },
+  "appTitle": "English",
+  "textArea": "inside",
+  "buttonTitle": "change lang"
+}
