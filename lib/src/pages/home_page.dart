@@ -1579,8 +1579,8 @@ class GroupList extends StatelessWidget {
         for (int i = 0; i < row; i++)
           Container(
             width: double.infinity,
-            height: 330,
-            margin: EdgeInsets.only(top: 10),
+            height: 250,
+            margin: EdgeInsets.only(top: 5),
             child: Column(
               children: <Widget>[
                 Container(
@@ -1660,12 +1660,10 @@ class GroupList extends StatelessWidget {
                 ),
                 Container(
                   width: double.infinity,
-                  height: 260,
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                    ),
+                  height: 180,
+                  child: ListView.builder(
                     itemCount: groupList[i].subgroup.length,
+                    scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       return Container(
                         margin: EdgeInsets.all(4),
@@ -1676,47 +1674,35 @@ class GroupList extends StatelessWidget {
                             Image.network(
                                 'http://apiinnovation.dyndns.org/alphadeal_backend_api/storage/app/' +
                                     groupList[i].XVGrpBoxFile),
+                            Container(
+                              padding: EdgeInsets.all(12),
+                              alignment: Alignment.bottomCenter,
+                              width: 180,
+                              height: 180,
+                              child: Image.network(
+                                'http://apiinnovation.dyndns.org/alphadeal_backend_api/storage/app/' +
+                                    groupList[i].subgroup[index].XVImgFile,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                             Positioned(
                               top: 8,
                               left: 8,
                               child: Text(
                                 groupList[i].subgroup[index].XVSubName_th,
                                 style: TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 12,
                                     color: Hexcolor(groupList[i].XVGrpColor5)),
                               ),
                             ),
                             Positioned(
-                              top: 18,
+                              top: 24,
                               left: 8,
                               child: Text(
                                 groupList[i].subgroup[index].XVSubName_en,
                                 style: TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 12,
                                     color: Hexcolor(groupList[i].XVGrpColor5)),
-                              ),
-                            ),
-                            Align(
-                              heightFactor: 20,
-                              child: Column(
-                                children: <Widget>[
-                                  Container(
-                                    height: 40,
-                                    alignment: Alignment.bottomCenter,
-                                  ),
-                                  Container(
-                                    width: 100,
-                                    height: 75,
-                                    alignment: Alignment.bottomCenter,
-                                    child: Image.network(
-                                      'http://apiinnovation.dyndns.org/alphadeal_backend_api/storage/app/' +
-                                          groupList[i]
-                                              .subgroup[index]
-                                              .XVImgFile,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ],
                               ),
                             ),
                           ],
@@ -1724,6 +1710,69 @@ class GroupList extends StatelessWidget {
                       );
                     },
                   ),
+//                  child: GridView.builder(
+//                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//                      crossAxisCount: 4,
+//                    ),
+//                    itemCount: groupList[i].subgroup.length,
+//                    itemBuilder: (context, index) {
+//                      return Container(
+//                        margin: EdgeInsets.all(4),
+//                        decoration: BoxDecoration(
+//                            borderRadius: BorderRadius.circular(16)),
+//                        child: Stack(
+//                          children: <Widget>[
+//                            Image.network(
+//                                'http://apiinnovation.dyndns.org/alphadeal_backend_api/storage/app/' +
+//                                    groupList[i].XVGrpBoxFile),
+//                            Positioned(
+//                              top: 8,
+//                              left: 8,
+//                              child: Text(
+//                                groupList[i].subgroup[index].XVSubName_th,
+//                                style: TextStyle(
+//                                    fontSize: 10,
+//                                    color: Hexcolor(groupList[i].XVGrpColor5)),
+//                              ),
+//                            ),
+//                            Positioned(
+//                              top: 18,
+//                              left: 8,
+//                              child: Text(
+//                                groupList[i].subgroup[index].XVSubName_en,
+//                                style: TextStyle(
+//                                    fontSize: 10,
+//                                    color: Hexcolor(groupList[i].XVGrpColor5)),
+//                              ),
+//                            ),
+//                            Align(
+//                              heightFactor: 20,
+//                              child: Column(
+//                                children: <Widget>[
+//                                  Container(
+//                                    height: 40,
+//                                    alignment: Alignment.bottomCenter,
+//                                  ),
+//                                  Container(
+//                                    width: 100,
+//                                    height: 75,
+//                                    alignment: Alignment.bottomCenter,
+//                                    child: Image.network(
+//                                      'http://apiinnovation.dyndns.org/alphadeal_backend_api/storage/app/' +
+//                                          groupList[i]
+//                                              .subgroup[index]
+//                                              .XVImgFile,
+//                                      fit: BoxFit.cover,
+//                                    ),
+//                                  ),
+//                                ],
+//                              ),
+//                            ),
+//                          ],
+//                        ),
+//                      );
+//                    },
+//                  ),
                 ),
               ],
             ),
