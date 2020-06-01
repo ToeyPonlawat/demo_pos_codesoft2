@@ -109,3 +109,108 @@ class SubGroup {
     );
   }
 }
+
+class Slide {
+  final String XVBanGroup;
+  final String XNBanSeq;
+  final String XVBanFileName;
+  final String XDBanDteStr;
+  final String XDBanDteEnd;
+  final String XVBanLink;
+
+  Slide({
+    this.XVBanGroup,
+    this.XNBanSeq,
+    this.XVBanFileName,
+    this.XDBanDteStr,
+    this.XDBanDteEnd,
+    this.XVBanLink,
+  });
+
+  factory Slide.fromJson(Map<String, dynamic> parsedJson) {
+    return Slide(
+      XVBanGroup: parsedJson['XVBanGroup'],
+      XNBanSeq: parsedJson['XNBanSeq'],
+      XVBanFileName: parsedJson['XVBanFileName'],
+      XDBanDteStr: parsedJson['XDBanDteStr'],
+      XDBanDteEnd: parsedJson['XDBanDteEnd'],
+      XVBanLink: parsedJson['XVBanLink'],
+    );
+  }
+}
+
+class NewProduct {
+  final String XVPdtCode;
+  final String XVPdtName_th;
+  final String XVPdtName_en;
+  final String XFPdtStdPrice;
+  final String XVImgFile;
+
+  NewProduct({
+    this.XVPdtCode,
+    this.XVPdtName_th,
+    this.XVPdtName_en,
+    this.XFPdtStdPrice,
+    this.XVImgFile,
+  });
+
+  factory NewProduct.fromJson(Map<String, dynamic> parsedJson) {
+    return NewProduct(
+      XVPdtCode: parsedJson['XVPdtCode'],
+      XVPdtName_th: parsedJson['XVPdtName_th'],
+      XVPdtName_en: parsedJson['XVPdtName_en'],
+      XFPdtStdPrice: parsedJson['XFPdtStdPrice'],
+      XVImgFile: parsedJson['XVImgFile'],
+    );
+  }
+}
+
+class BestSeller {
+  final String XVPdtCode;
+  final String XVPdtName_th;
+  final String XVPdtName_en;
+  final String XFPdtStdPrice;
+  final String XVImgFile;
+
+  BestSeller({
+    this.XVPdtCode,
+    this.XVPdtName_th,
+    this.XVPdtName_en,
+    this.XFPdtStdPrice,
+    this.XVImgFile,
+  });
+
+  factory BestSeller.fromJson(Map<String, dynamic> parsedJson) {
+    return BestSeller(
+      XVPdtCode: parsedJson['XVPdtCode'],
+      XVPdtName_th: parsedJson['XVPdtName_th'],
+      XVPdtName_en: parsedJson['XVPdtName_en'],
+      XFPdtStdPrice: parsedJson['XFPdtStdPrice'],
+      XVImgFile: parsedJson['XVImgFile'],
+    );
+  }
+}
+
+class Brand {
+  final String XVBndCode;
+  final String XVBndName_th;
+  final String XVBndName_en;
+  final String XVImgFile;
+
+  Brand({
+    this.XVBndCode,
+    this.XVBndName_th,
+    this.XVBndName_en,
+    this.XVImgFile
+  });
+
+  factory Brand.fromJson(Map<String, dynamic> parsedJson) {
+    return Brand(
+      XVBndCode: parsedJson['XVBndCode'],
+      XVBndName_th: parsedJson['XVBndName_th'],
+      XVBndName_en: parsedJson['XVBndName_en'],
+      XVImgFile: parsedJson['XVImgFile'],
+    );
+  }
+}
+

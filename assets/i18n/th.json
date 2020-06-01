@@ -1,0 +1,15 @@
+{
+  "title": "หวัดดี!",
+  "Message" : "ภาษาไทย",
+  "home_label_default_search" :  "ชื่อสินค้า/รหัสสินค้า/ประเภทสินค้า",
+  "home_label_new_product" : "สินค้าใหม่",
+  "home_label_best_seller" : "สินค้าขายดี",
+  "home_label_categories" : "หมวดหมู่สินค้า",
+  "general_label_group" : "กลุ่มที่",
+  "general_label_home" : "หน้าหลัก",
+  "general_label_product" : "สินค้า",
+  "general_label_about" : "เกี่ยวกับเรา",
+  "general_label_contact" : "ติดต่อเรา",
+  "general_label_me" : "บัญชี",
+  "general_label_profile" : "โปรไฟล์"
+}
