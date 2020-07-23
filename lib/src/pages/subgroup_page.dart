@@ -1,6 +1,8 @@
 import 'package:alphadealdemo/src/locale/app_localization.dart';
+import 'package:alphadealdemo/src/models/home.dart';
 import 'package:alphadealdemo/src/models/subgroup.dart';
 import 'package:alphadealdemo/src/pages/category_page.dart';
+import 'package:alphadealdemo/src/pages/home_page.dart';
 import 'package:alphadealdemo/src/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -10,11 +12,13 @@ import 'dart:convert';
 import 'package:sticky_headers/sticky_headers.dart';
 
 var globalScreen;
+int intitialDonut = 0;
 
 // fetch Group Icon data
 Future<GroupBanner> fetchGroup(String grpCode, String subCode) async {
   final url =
       Constant.CAT_URL_SERVICES + grpCode + '/' + subCode + '?app=pdt_group';
+  //print(url);
   final response = await http.get(url);
   return parseGroup(response.body);
 }
@@ -35,15 +39,38 @@ Future<List<Category>> fetchCategory(String grpCode, String subCode) async {
 List<Category> parseCategory(String responseBody) {
   final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
   return parsed.map<Category>((json) => Category.fromJson(json)).toList();
+} // fetch Group Icon data
+
+Future<List<ProductGroup>> fetchProductGroup() async {
+  final url = Constant.MAIN_URL_SERVICES + 'pdt_group';
+  final response = await http.get(url);
+  return parseProductGroup(response.body);
 }
 
-class SubGroupPage extends StatelessWidget {
+List<ProductGroup> parseProductGroup(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  return parsed
+      .map<ProductGroup>((json) => ProductGroup.fromJson(json))
+      .toList();
+}
+
+class SubGroupPage extends StatefulWidget {
   final String grpcode;
   final String subcode;
+  final Function goToDonut;
 
-  SubGroupPage({Key key, @required this.subcode, this.grpcode})
+  void goToDonutParent() {
+    goToDonut();
+  }
+
+  SubGroupPage({Key key, @required this.subcode, this.grpcode, this.goToDonut})
       : super(key: key);
 
+  @override
+  _SubGroupPageState createState() => _SubGroupPageState();
+}
+
+class _SubGroupPageState extends State<SubGroupPage> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -60,158 +87,178 @@ class SubGroupPage extends StatelessWidget {
               children: <Widget>[
                 StickyHeader(
                   header: Container(
-                      padding: EdgeInsets.only(bottom: 0, top: 0),
-                      decoration: BoxDecoration(
-                          color: Color.fromRGBO(253, 250, 254, 1.0),
-                          shape: BoxShape.rectangle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black38,
-                              offset: const Offset(0.0, 6.0),
-                              blurRadius: 3.0,
-                              spreadRadius: 1.0,
-                            ),
-                          ]),
-                      child: Container(
-                        width: double.infinity,
-                        height: (screenSize.height / 100) * 7.5,
-                        padding: EdgeInsets.only(top: 5),
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                              width: (screenSize.width * 0.74),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Container(
-                                    width: (screenSize.width * 0.55),
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(width: 1)),
-                                    child: TextField(
-                                      autofocus: false,
-                                      decoration: InputDecoration(
-                                          fillColor: Colors.white,
-                                          hintText:
-                                              'ชื่อสินค้า/รหัสสินค้า/ประเภทสินค้า',
-                                          contentPadding: EdgeInsets.only(
-                                              left: 7,
-                                              top: 5,
-                                              right: 20,
-                                              bottom: 7)),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: (screenSize.width * 0.14),
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(width: 1),
-                                        top: BorderSide(width: 1),
-                                        right: BorderSide(width: 1),
+                    padding: EdgeInsets.only(bottom: 0, top: 0),
+                    decoration: BoxDecoration(
+                        color: Color.fromRGBO(253, 250, 254, 1.0),
+                        shape: BoxShape.rectangle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black38,
+                            offset: const Offset(0.0, 6.0),
+                            blurRadius: 3.0,
+                            spreadRadius: 1.0,
+                          ),
+                        ]),
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          width: double.infinity,
+                          height: (screenSize.height / 100) * 7.5,
+                          padding: EdgeInsets.only(top: 5),
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                width: (screenSize.width * 0.74),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    Container(
+                                      width: (screenSize.width * 0.55),
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                          border: Border.all(width: 1)),
+                                      child: TextField(
+                                        autofocus: false,
+                                        decoration: InputDecoration(
+                                            fillColor: Colors.white,
+                                            hintText:
+                                                'ชื่อสินค้า/รหัสสินค้า/ประเภทสินค้า',
+                                            contentPadding: EdgeInsets.only(
+                                                left: 7,
+                                                top: 5,
+                                                right: 20,
+                                                bottom: 7)),
                                       ),
-                                      color: Colors.amber,
                                     ),
-                                    child: IconButton(
+                                    Container(
+                                      width: (screenSize.width * 0.14),
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(width: 1),
+                                          top: BorderSide(width: 1),
+                                          right: BorderSide(width: 1),
+                                        ),
+                                        color: Colors.amber,
+                                      ),
+                                      child: IconButton(
+                                        icon: Icon(
+                                          Icons.search,
+                                          color: Colors.black,
+                                          size: 30,
+                                        ),
+                                        padding: EdgeInsets.only(bottom: 0.5),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: (screenSize.width * 0.13),
+                                alignment: Alignment.centerRight,
+                                child: Stack(
+                                  children: <Widget>[
+                                    IconButton(
                                       icon: Icon(
-                                        Icons.search,
+                                        Icons.shopping_cart,
                                         color: Colors.black,
                                         size: 30,
                                       ),
                                       padding: EdgeInsets.only(bottom: 0.5),
                                     ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Container(
-                              width: (screenSize.width * 0.13),
-                              alignment: Alignment.centerRight,
-                              child: Stack(
-                                children: <Widget>[
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.shopping_cart,
-                                      color: Colors.black,
-                                      size: 30,
-                                    ),
-                                    padding: EdgeInsets.only(bottom: 0.5),
-                                  ),
-                                  Positioned(
-                                    right: 4,
-                                    top: 4,
-                                    child: Container(
-                                      padding: EdgeInsets.all(1),
-                                      decoration: new BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      constraints: BoxConstraints(
-                                        minWidth: 14,
-                                        minHeight: 14,
-                                      ),
-                                      child: Text(
-                                        '1',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 8,
+                                    Positioned(
+                                      right: 4,
+                                      top: 4,
+                                      child: Container(
+                                        padding: EdgeInsets.all(1),
+                                        decoration: new BoxDecoration(
+                                          color: Colors.red,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Container(
-                              width: (screenSize.width * 0.10),
-                              alignment: Alignment.centerLeft,
-                              child: Stack(
-                                children: <Widget>[
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.favorite,
-                                      color: Colors.black,
-                                      size: 30,
-                                    ),
-                                    padding: EdgeInsets.only(bottom: 0.5),
-                                  ),
-                                  Positioned(
-                                    right: 2,
-                                    top: 4,
-                                    child: Container(
-                                      padding: EdgeInsets.all(1),
-                                      decoration: new BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      constraints: BoxConstraints(
-                                        minWidth: 14,
-                                        minHeight: 14,
-                                      ),
-                                      child: Text(
-                                        '1',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 8,
+                                        constraints: BoxConstraints(
+                                          minWidth: 14,
+                                          minHeight: 14,
                                         ),
-                                        textAlign: TextAlign.center,
+                                        child: Text(
+                                          '1',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 8,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                ],
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                              Container(
+                                width: (screenSize.width * 0.10),
+                                alignment: Alignment.centerLeft,
+                                child: Stack(
+                                  children: <Widget>[
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.favorite,
+                                        color: Colors.black,
+                                        size: 30,
+                                      ),
+                                      padding: EdgeInsets.only(bottom: 0.5),
+                                    ),
+                                    Positioned(
+                                      right: 2,
+                                      top: 4,
+                                      child: Container(
+                                        padding: EdgeInsets.all(1),
+                                        decoration: new BoxDecoration(
+                                          color: Colors.red,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        constraints: BoxConstraints(
+                                          minWidth: 14,
+                                          minHeight: 14,
+                                        ),
+                                        child: Text(
+                                          '1',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 8,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      )),
+                        FutureBuilder<List<ProductGroup>>(
+                          future: fetchProductGroup(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) print(snapshot.error);
+
+                            return snapshot.hasData
+                                ? GroupIconList(
+                                    groupList: snapshot.data,
+                                    goToDonut: widget.goToDonut,
+                                  )
+                                : Center(child: CircularProgressIndicator());
+                          },
+                        )
+                      ],
+                    ),
+                  ),
                   content: Container(
                     color: Colors.white,
                     padding: EdgeInsets.only(top: screenSize.height / 100),
                     child: Column(
                       children: <Widget>[
                         FutureBuilder<GroupBanner>(
-                          future: fetchGroup(grpcode, subcode),
+                          future: fetchGroup(widget.grpcode, widget.subcode),
                           builder: (context, snapshot) {
                             if (snapshot.hasError) print(snapshot.error);
 
@@ -221,7 +268,7 @@ class SubGroupPage extends StatelessWidget {
                           },
                         ),
                         FutureBuilder<List<Category>>(
-                          future: fetchCategory(grpcode, subcode),
+                          future: fetchCategory(widget.grpcode, widget.subcode),
                           builder: (context, snapshot) {
                             if (snapshot.hasError) print(snapshot.error);
 
@@ -362,8 +409,8 @@ class CategoryList extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) => CategoryPage(
-                      catcode: catcode,
-                    )),
+                          catcode: catcode,
+                        )),
               );
             },
             child: Card(
@@ -378,7 +425,8 @@ class CategoryList extends StatelessWidget {
                           top: 28, left: 24, right: 24, bottom: 8),
                       alignment: Alignment.bottomCenter,
                       child: Image.network(
-                        Constant.MAIN_URL_ASSETS + categoryList[index].XVImgFile,
+                        Constant.MAIN_URL_ASSETS +
+                            categoryList[index].XVImgFile,
                         fit: BoxFit.scaleDown,
                       ),
                     ),
@@ -400,6 +448,82 @@ class CategoryList extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ignore: must_be_immutable
+class GroupIconList extends StatefulWidget {
+  final List<ProductGroup> groupList;
+
+  final Function goToDonut;
+
+  GroupIconList({Key key, this.groupList, this.goToDonut}) : super(key: key);
+
+  @override
+  _GroupIconListState createState() => _GroupIconListState();
+}
+
+class _GroupIconListState extends State<GroupIconList> {
+  Size screenSize = globalScreen;
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+
+    return Container(
+      width: double.infinity,
+      height:
+          ((widget.groupList.length / 5.75).ceil() * (screenSize.width / 5.75)),
+      margin: EdgeInsets.only(
+          left: (screenSize.width * 0.025), right: (screenSize.width * 0.025)),
+      padding: EdgeInsets.only(
+          left: (screenSize.width * 0.025), right: (screenSize.width * 0.025)),
+      child: ListView.builder(
+        itemCount: widget.groupList.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => HomeApp(1, index)),
+                      (Route<dynamic> route) => false);
+            },
+            child: Container(
+              width: ((widget.groupList.length / 6.25).ceil() *
+                  (screenSize.width / 6.25)),
+              margin: EdgeInsets.only(right: (screenSize.width * 0.025)),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    width: ((widget.groupList.length / 10.25).ceil() *
+                        (screenSize.width / 10.25)),
+                    height: ((widget.groupList.length / 12.25).ceil() *
+                        (screenSize.width / 12.25)),
+                    margin: EdgeInsets.only(top: (screenSize.height * 0.0125)),
+                    alignment: Alignment.topCenter,
+                    child: Image.network(
+                      Constant.MAIN_URL_ASSETS +
+                          widget.groupList[index].XVGrpIconFile,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.bottomCenter,
+                    child: Text(
+                      (AppLocalizations.of(context).locale.toString() == 'th')
+                          ? widget.groupList[index].XVGrpName_th
+                          : widget.groupList[index].XVGrpName_en,
+                      style: TextStyle(fontSize: 10),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )
+                ],
               ),
             ),
           );

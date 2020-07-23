@@ -2,10 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:alphadealdemo/src/locale/app_localization.dart';
+import 'package:alphadealdemo/src/pages/language_page.dart';
+import 'package:alphadealdemo/src/pages/register_page.dart';
+import 'package:alphadealdemo/src/pages/reset_password_page.dart';
+import 'package:alphadealdemo/src/services/app_language.dart';
 import 'package:alphadealdemo/src/services/databases.dart';
 import 'package:alphadealdemo/src/utils/constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:alphadealdemo/src/bloc/database_bloc.dart';
@@ -24,19 +29,26 @@ class Post {
   final String XVName;
   final String XVEmail;
 
-
-  Post({this.username, this.password, this.app, this.success,this.XVConCode,this.XVUser,this.XVName,this.XVEmail});
+  Post(
+      {this.username,
+      this.password,
+      this.app,
+      this.success,
+      this.XVConCode,
+      this.XVUser,
+      this.XVName,
+      this.XVEmail});
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
-        username: json['username'],
-        password: json['password'],
-        app: json['app'],
-        success: json['success'],
-        XVConCode: json['XVConCode'],
-        XVUser: json['XVUser'],
-        XVName: json['XVName'],
-        XVEmail: json['XVEmail'],
+      username: json['username'],
+      password: json['password'],
+      app: json['app'],
+      success: json['success'],
+      XVConCode: json['XVConCode'],
+      XVUser: json['XVUser'],
+      XVName: json['XVName'],
+      XVEmail: json['XVEmail'],
     );
   }
 
@@ -51,6 +63,7 @@ class Post {
 }
 
 Future<Post> createPost(String url, {Map body}) async {
+  //print(url);
   return http.post(url, body: body).then((http.Response response) {
     final int statusCode = response.statusCode;
 
@@ -86,14 +99,13 @@ class _MePageState extends State<MePage> {
 
   @override
   Widget build(BuildContext context) {
-
     var screenSize = MediaQuery.of(context).size;
     globalScreen = screenSize;
     return FutureBuilder(
       future: checkIsLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          if (snapshot.data  == true) {
+          if (snapshot.data == true) {
             return _buildProfilePage(context, screenSize);
           }
           return _buildLoginPage(screenSize, context);
@@ -102,42 +114,7 @@ class _MePageState extends State<MePage> {
       },
     );
 
-//    var appLanguage = Provider.of<AppLanguage>(context);
-//    return Scaffold(
-//      appBar: AppBar(
-//        title: Text(AppLocalizations.of(context).translate('title')),
-//      ),
-//      ),
-//      body: Center(
-//        child: Column(
-//          mainAxisAlignment: MainAxisAlignment.center,
-//          crossAxisAlignment: CrossAxisAlignment.center,
-//          children: <Widget>[
-//            Text(
-//              AppLocalizations.of(context).translate('Message'),
-//              style: TextStyle(fontSize: 32),
-//            ),
-//            Row(
-//              mainAxisAlignment: MainAxisAlignment.center,
-//              children: <Widget>[
-//                RaisedButton(
-//                  onPressed: () {
-//                    appLanguage.changeLanguage(Locale("en"));
-//                  },
-//                  child: Text('English'),
-//                ),
-//                RaisedButton(
-//                  onPressed: () {
-//                    appLanguage.changeLanguage(Locale("th"));
-//                  },
-//                  child: Text('ไทย'),
-//                )
-//              ],
-//            )
-//          ],
-//        ),
-//      ),
-//    );
+//
   }
 
   Future<bool> checkIsLogin() async {
@@ -267,7 +244,7 @@ class _MePageState extends State<MePage> {
                               Post p = await createPost(
                                   Constant.MAIN_URL_API + "login",
                                   body: newPost.toMap());
-
+                              //print(p);
                               if (p.success == 'ok') {
                                 showDialogLoading();
 
@@ -305,6 +282,14 @@ class _MePageState extends State<MePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       FlatButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ResetPasswordPage(),
+                            ),
+                          );
+                        },
                         child: Text(
                           'ลืมรหัสผ่าน',
                           style: TextStyle(
@@ -313,6 +298,14 @@ class _MePageState extends State<MePage> {
                         ),
                       ),
                       FlatButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegisterPage(),
+                            ),
+                          );
+                        },
                         child: Text(
                           'สมัครสมาชิก',
                           style: TextStyle(
@@ -462,25 +455,12 @@ class _MePageState extends State<MePage> {
                 ),
               ]),
           child: _buildStackProfileCard(screenSize)),
-      Positioned(
-        right: 10,
-        top: 15,
-        child: FlatButton(
-          onPressed: () {
-            // do something
-          },
-          child: Container(
-            child: Icon(
-              Icons.settings,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
     ]);
   }
 
   Container _buildProfileMenu(Size screenSize) {
+    var appLanguage = Provider.of<AppLanguage>(context);
+    var lang = appLanguage.appLocal.toString();
     return Container(
       width: double.infinity,
       color: Colors.white,
@@ -496,7 +476,7 @@ class _MePageState extends State<MePage> {
       child: Column(
         children: <Widget>[
           Padding(
-              padding: EdgeInsets.only(bottom: (screenSize.height / 100) * 1)),
+              padding: EdgeInsets.only(bottom: (screenSize.height / 100) * 3)),
           FlatButton(
             onPressed: () {
               // do something
@@ -535,9 +515,10 @@ class _MePageState extends State<MePage> {
                     padding: EdgeInsets.only(right: 10),
                   ),
                   Text(
-                    'ประวัติการซื้อ',
+                    'ประวัติการสั่งซื้อ',
                     style: TextStyle(
                       fontSize: (screenSize.width / 100) * 4,
+                      fontWeight: FontWeight.normal,
                     ),
                   )
                 ],
@@ -545,105 +526,7 @@ class _MePageState extends State<MePage> {
             ),
           ),
           Padding(
-              padding: EdgeInsets.only(bottom: (screenSize.height / 100) * 1)),
-          FlatButton(
-            onPressed: () {
-              // do something
-            },
-            child: Container(
-              width: double.infinity,
-              height: 50,
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(
-                      left: (screenSize.width / 100) * 2,
-                      right: (screenSize.width / 100) * 2,
-                    ),
-                    width: (screenSize.width / 100) * 12,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Constant.MAIN_BASE_COLOR,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black38,
-                          offset: const Offset(0.0, 1.0),
-                          blurRadius: 2.0,
-                          spreadRadius: 1.0,
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      Icons.attach_money,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(right: 10),
-                  ),
-                  Text(
-                    'สถานะการสั่งซื้อ',
-                    style: TextStyle(
-                      fontSize: (screenSize.width / 100) * 4,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          Padding(
-              padding: EdgeInsets.only(bottom: (screenSize.height / 100) * 1)),
-          FlatButton(
-            onPressed: () {
-              // do something
-            },
-            child: Container(
-              width: double.infinity,
-              height: 50,
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(
-                      left: (screenSize.width / 100) * 2,
-                      right: (screenSize.width / 100) * 2,
-                    ),
-                    width: (screenSize.width / 100) * 12,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Constant.MAIN_BASE_COLOR,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black38,
-                          offset: const Offset(0.0, 1.0),
-                          blurRadius: 2.0,
-                          spreadRadius: 1.0,
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      Icons.vpn_key,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(right: 10),
-                  ),
-                  Text(
-                    'เปลี่ยนรหัสผ่าน',
-                    style: TextStyle(
-                      fontSize: (screenSize.width / 100) * 4,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          Padding(
-              padding: EdgeInsets.only(bottom: (screenSize.height / 100) * 1)),
+              padding: EdgeInsets.only(bottom: (screenSize.height / 100) * 2)),
           FlatButton(
             onPressed: () {
               // do something
@@ -685,6 +568,7 @@ class _MePageState extends State<MePage> {
                     'ข้อมูลส่วนตัว',
                     style: TextStyle(
                       fontSize: (screenSize.width / 100) * 4,
+                      fontWeight: FontWeight.normal,
                     ),
                   )
                 ],
@@ -692,7 +576,61 @@ class _MePageState extends State<MePage> {
             ),
           ),
           Padding(
-              padding: EdgeInsets.only(bottom: (screenSize.height / 100) * 1)),
+              padding: EdgeInsets.only(bottom: (screenSize.height / 100) * 2)),
+          FlatButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LanguagePage(),
+                  ));
+            },
+            child: Container(
+              width: double.infinity,
+              height: 50,
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.only(
+                      left: (screenSize.width / 100) * 2,
+                      right: (screenSize.width / 100) * 2,
+                    ),
+                    width: (screenSize.width / 100) * 12,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Constant.MAIN_BASE_COLOR,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black38,
+                          offset: const Offset(0.0, 1.0),
+                          blurRadius: 2.0,
+                          spreadRadius: 1.0,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.flag,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(right: 10),
+                  ),
+                  Text(
+                    (lang == 'th') ? 'เปลี่ยนภาษา' : 'Language',
+                    style: TextStyle(
+                      fontSize: (screenSize.width / 100) * 4,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Padding(
+              padding: EdgeInsets.only(bottom: (screenSize.height / 100) * 2)),
           FlatButton(
             onPressed: () async {
               showDialogLoading();
@@ -741,13 +679,14 @@ class _MePageState extends State<MePage> {
                     'ออกจากระบบ',
                     style: TextStyle(
                       fontSize: (screenSize.width / 100) * 4,
+                      fontWeight: FontWeight.normal,
                     ),
                   )
                 ],
               ),
             ),
           ),
-          Padding(padding: EdgeInsets.only(bottom: 90)),
+          Padding(padding: EdgeInsets.only(bottom: 110)),
         ],
       ),
     );
@@ -788,11 +727,12 @@ class _MePageState extends State<MePage> {
           ),
           FutureBuilder<List<Client>>(
             future: DBProvider.db.getAllClients(),
-            builder: (BuildContext context, AsyncSnapshot<List<Client>> snapshot) {
+            builder:
+                (BuildContext context, AsyncSnapshot<List<Client>> snapshot) {
               if (snapshot.hasData) {
                 Client item = snapshot.data[0];
                 return Text(
-                  item.XVName != null ? item.XVName : '' ,
+                  item.XVName != null ? item.XVName : '',
                   style: TextStyle(
                     fontSize: (screenSize.width / 100) * 4.5,
                     color: Colors.black,
@@ -811,11 +751,12 @@ class _MePageState extends State<MePage> {
           ),
           FutureBuilder<List<Client>>(
             future: DBProvider.db.getAllClients(),
-            builder: (BuildContext context, AsyncSnapshot<List<Client>> snapshot) {
+            builder:
+                (BuildContext context, AsyncSnapshot<List<Client>> snapshot) {
               if (snapshot.hasData) {
                 Client item = snapshot.data[0];
                 return Text(
-                  item.XVEmail != null ? item.XVEmail : '' ,
+                  item.XVEmail != null ? item.XVEmail : '',
                   style: TextStyle(
                     fontSize: (screenSize.width / 100) * 3.5,
                     color: Colors.black,

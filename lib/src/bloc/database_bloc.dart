@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:alphadealdemo/src/models/cart.dart';
 import 'package:alphadealdemo/src/models/client.dart';
 import 'package:alphadealdemo/src/services/databases.dart';
 
@@ -38,5 +39,42 @@ class ClientsBloc {
   add(Client client) {
     DBProvider.db.newClient(client);
 //    getClients();
+  }
+}
+
+class CartBloc {
+  final _cartController = StreamController<List<Cart>>.broadcast();
+
+  get carts => _cartController.stream;
+
+  dispose() {
+    _cartController.close();
+  }
+
+  getCarts() async {
+    _cartController.sink.add(await DBProvider.db.getAllCarts());
+  }
+
+  CartBloc() {
+    getCarts();
+  }
+
+  deleteAll() {
+    DBProvider.db.deleteAllCart();
+//    getClients();
+  }
+
+  delete(String id) {
+    DBProvider.db.deleteCart(id);
+//    getClients();
+  }
+
+  add(Cart cart) {
+    DBProvider.db.newCart(cart);
+//    getClients();
+  }
+
+  getCountNoti() {
+    DBProvider.db.getCountNotiCart();
   }
 }

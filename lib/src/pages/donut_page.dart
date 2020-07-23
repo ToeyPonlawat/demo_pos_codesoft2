@@ -106,7 +106,13 @@ class GroupIconList extends StatefulWidget {
 
 class _GroupIconListState extends State<GroupIconList> {
   Size screenSize = globalScreen;
-  int isSelect = 2;
+  int isSelect = 0;
+
+  void defineDonut() {
+    setState(() {
+      isSelect = groupCount;
+    });
+  }
 
   @override
   void initState() {
@@ -206,7 +212,10 @@ class _GroupIconListState extends State<GroupIconList> {
               if (snapshot.hasError) print(snapshot.error);
 
               return snapshot.hasData
-                  ? new DonutList(groupList: snapshot.data)
+                  ? new DonutList(
+                      groupList: snapshot.data,
+                      callParent: this.defineDonut,
+                    )
                   : Center(child: CircularProgressIndicator());
             },
           ),
@@ -219,16 +228,9 @@ class _GroupIconListState extends State<GroupIconList> {
 // ignore: must_be_immutable
 class DonutList extends StatefulWidget {
   final List<DonutGroup> groupList;
-  final List<DonutSubGroup> subList;
-  final List<DonutCat> catList;
-  _GroupIconListState parent;
+  final Function callParent;
 
-  DonutList({
-    Key key,
-    this.groupList,
-    this.subList,
-    this.catList,
-  }) : super(key: key);
+  DonutList({Key key, this.groupList, this.callParent}) : super(key: key);
 
   @override
   _DonutListState createState() => _DonutListState();
@@ -276,14 +278,23 @@ class _DonutListState extends State<DonutList> {
                         var subcode =
                             widget.groupList[groupSelect].SubGrp[i].XVSubCode;
                         var grpcode = widget.groupList[groupSelect].XVGrpCode;
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SubGroupPage(
-                                    subcode: subcode,
-                                    grpcode: grpcode,
-                                  )),
+
+                        MaterialPageRoute material = MaterialPageRoute(
+                          builder: (context) => SubGroupPage(
+                            subcode: subcode,
+                            grpcode: grpcode,
+                          ),
                         );
+
+                        Navigator.of(context).push(material).then((value) => {
+                              if (value != null)
+                                {
+                                  setState(() {
+                                    groupCount = value;
+                                    widget.callParent();
+                                  })
+                                }
+                            });
                       },
                       child: Container(
                         padding: const EdgeInsets.only(left: 15.0),
@@ -314,33 +325,42 @@ class _DonutListState extends State<DonutList> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => CategoryPage(
-                                          catcode: catcode,
-                                        )),
+                                  builder: (context) => CategoryPage(
+                                    catcode: catcode,
+                                  ),
+                                ),
                               );
                             },
                             child: Container(
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Colors.black87, width: 1),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(24)),
-                                    shape: BoxShape.rectangle),
-                                child: Text(
-                                  (AppLocalizations.of(context)
-                                              .locale
-                                              .toString() ==
-                                          'th')
-                                      ? item.XVCatName_th
-                                      : item.XVCatName_en,
-                                  style: TextStyle(
-                                    fontSize: (screenSize.width / 100) * 3.5,
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black87,
+                                    width: 1,
                                   ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(24),
+                                  ),
+                                  shape: BoxShape.rectangle),
+                              child: Text(
+                                (AppLocalizations.of(context)
+                                            .locale
+                                            .toString() ==
+                                        'th')
+                                    ? item.XVCatName_th
+                                    : item.XVCatName_en,
+                                style: TextStyle(
+                                  fontSize: (screenSize.width / 100) * 3.5,
                                 ),
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: 4, vertical: 4),
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 4)),
+                              ),
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 4,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 4,
+                              ),
+                            ),
                           )
                       ],
                     ),

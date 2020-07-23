@@ -42,6 +42,8 @@ class ProductList {
   final String XVPdtName_th;
   final String XVPdtName_en;
   final String XFPdtStdPrice;
+  final String XVBndName_th;
+  final String XVBndName_en;
   final String pdtImg;
   final String bndImg;
   final String modImg;
@@ -55,6 +57,8 @@ class ProductList {
     this.XVPdtName_th,
     this.XVPdtName_en,
     this.XFPdtStdPrice,
+    this.XVBndName_th,
+    this.XVBndName_en,
     this.pdtImg,
     this.bndImg,
     this.modImg,
@@ -70,6 +74,8 @@ class ProductList {
       XVPdtName_th: parsedJson['XVPdtName_th'],
       XVPdtName_en: parsedJson['XVPdtName_en'],
       XFPdtStdPrice: parsedJson['XFPdtStdPrice'],
+      XVBndName_th: parsedJson['XVBndName_th'],
+      XVBndName_en: parsedJson['XVBndName_en'],
       pdtImg: parsedJson['pdtImg'],
       bndImg: parsedJson['bndImg'],
       modImg: parsedJson['modImg'],
@@ -77,19 +83,19 @@ class ProductList {
   }
 }
 
-class BrandList {
+class ProductBrandList {
   final String XVBndCode;
   final String XVBndName_th;
   final String XVBndName_en;
 
-  BrandList({
+  ProductBrandList({
     this.XVBndCode,
     this.XVBndName_th,
     this.XVBndName_en,
   });
 
-  factory BrandList.fromJson(dynamic parsedJson) {
-    return BrandList(
+  factory ProductBrandList.fromJson(dynamic parsedJson) {
+    return ProductBrandList(
       XVBndCode: parsedJson['XVBndCode'],
       XVBndName_th: parsedJson['XVBndName_th'],
       XVBndName_en: parsedJson['XVBndName_en'],

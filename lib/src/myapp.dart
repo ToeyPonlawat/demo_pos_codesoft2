@@ -1,11 +1,11 @@
 import 'package:alphadealdemo/src/locale/app_localization.dart';
 import 'package:alphadealdemo/src/locale/fallback_localization.dart';
 import 'package:alphadealdemo/src/pages/about_page.dart';
+import 'package:alphadealdemo/src/pages/cart_page.dart';
 import 'package:alphadealdemo/src/pages/donut_page.dart';
 import 'package:alphadealdemo/src/pages/contact_page.dart';
 import 'package:alphadealdemo/src/pages/home_page.dart';
-import 'package:alphadealdemo/src/pages/me_page.dart';
-import 'package:alphadealdemo/src/pages/product_page.dart';
+import 'package:alphadealdemo/src/pages/profile_page.dart';
 import 'package:alphadealdemo/src/services/app_language.dart';
 import 'package:alphadealdemo/src/utils/constant.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +30,10 @@ class MyApp extends StatelessWidget {
             Locale('en', 'US'),
             Locale('th', ''),
           ],
+          routes: {
+            '/': (context) => HomeApp(0,0),
+            '/profile': (context) => HomeApp(4,0),
+          },
           localizationsDelegates: [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -37,7 +41,6 @@ class MyApp extends StatelessWidget {
             const FallbackCupertinoLocalisationsDelegate()
           ],
           theme: ThemeData(fontFamily: 'Prompt'),
-          home: HomeApp(),
         );
       }),
     );

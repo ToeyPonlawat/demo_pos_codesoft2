@@ -1,49 +1,34 @@
 import 'dart:convert';
+
 import 'package:alphadealdemo/src/locale/app_localization.dart';
 import 'package:alphadealdemo/src/models/category.dart';
-import 'package:alphadealdemo/src/models/home.dart';
-import 'package:alphadealdemo/src/pages/home_page.dart';
-import 'package:alphadealdemo/src/pages/model_detail_page.dart';
 import 'package:alphadealdemo/src/pages/product_detail_page.dart';
 import 'package:alphadealdemo/src/utils/constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sticky_headers/sticky_headers.dart';
+import 'package:sticky_headers/sticky_headers/widget.dart';
 import 'package:http/http.dart' as http;
+
+import 'model_detail_page.dart';
 
 var globalScreen;
 var globalOrder;
-String catName;
-var bnd = [];
-
-// fetch Group Icon data
-Future<List<ProductGroup>> fetchProductGroup() async {
-  final url = Constant.MAIN_URL_SERVICES + 'pdt_group';
-  final response = await http.get(url);
-  return parseProductGroup(response.body);
-}
-
-List<ProductGroup> parseProductGroup(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  return parsed
-      .map<ProductGroup>((json) => ProductGroup.fromJson(json))
-      .toList();
-}
+String bndName;
 
 // fetch Product list in Category
 Future<List<ProductList>> fetchProductList(
-    String catcode, String orderBy, List brand) async {
-  String url = Constant.PDT_LIST_URL_SERVICES + catcode;
+    String bndcode, String orderBy) async {
+  String url = Constant.PDT_BND_LIST_URL_SERVICES + bndcode;
   if (orderBy != null && orderBy.length > 0) {
-    url += '/?app=pdt&selectOrderby=$orderBy';
+    url += '?app=pdt&selectOrderby=$orderBy';
   } else {
-    url += '/?app=pdt';
+    url += '?app=pdt';
   }
-
-  if (brand != []) {
-    for (int i = 0; i < brand.length; i++)
-      url += '&XVBndCodeArr[$i]=' + brand[i].toString();
-  }
+//
+//  if (brand != []) {
+//    for (int i = 0; i < brand.length; i++)
+//      url += '&XVBndCodeArr[$i]=' + brand[i].toString();
+//  }
 
   //print(url);
 
@@ -56,49 +41,16 @@ List<ProductList> parseProductList(String responseBody) {
   return parsed.map<ProductList>((json) => ProductList.fromJson(json)).toList();
 }
 
-// fetch Product list in Category
-Future<List<ProductBrandList>> fetchBrandList(String catcode) async {
-  String url = Constant.PDT_LIST_URL_SERVICES + catcode + '/?app=brand';
-  final response = await http.get(url);
-  return parseBrandList(response.body);
-}
+class ProductBrandPage extends StatefulWidget {
+  final String bndcode;
 
-List<ProductBrandList> parseBrandList(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  return parsed
-      .map<ProductBrandList>((json) => ProductBrandList.fromJson(json))
-      .toList();
-}
-
-// fetch Category Detail
-Future<CategoryDetail> fetchCategory(String catcode) async {
-  String url = Constant.PDT_LIST_URL_SERVICES + catcode;
-  url += '/?app=res';
-
-  final response = await http.get(url);
-  return parseCategoryDetail(response.body);
-}
-
-CategoryDetail parseCategoryDetail(String responseBody) {
-  final parsed = jsonDecode(responseBody);
-  return CategoryDetail.fromJson(parsed);
-}
-
-class CategoryPage extends StatefulWidget {
-  final String catcode;
-  final CategoryDetail categoryDetail;
-
-  CategoryPage({
-    Key key,
-    @required this.catcode,
-    this.categoryDetail,
-  }) : super(key: key);
+  ProductBrandPage({Key key, this.bndcode}) : super(key: key);
 
   @override
-  _CategoryPageState createState() => _CategoryPageState();
+  _ProductBrandPageState createState() => _ProductBrandPageState();
 }
 
-class _CategoryPageState extends State<CategoryPage> {
+class _ProductBrandPageState extends State<ProductBrandPage> {
   String dropdownValue = 'ความนิยม';
   String selectOrderby;
   String _categoryName;
@@ -115,112 +67,6 @@ class _CategoryPageState extends State<CategoryPage> {
     var screenSize = MediaQuery.of(context).size;
     globalScreen = screenSize;
     return Scaffold(
-      endDrawer: SafeArea(
-        child: Container(
-          height: double.maxFinite,
-          width: screenSize.width * 0.75,
-          margin: EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(16),
-              topLeft: Radius.circular(16),
-            ),
-          ),
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Container(
-                  width: double.infinity,
-                  height: screenSize.height * 0.2,
-                  decoration: BoxDecoration(
-                    color: Constant.MAIN_BASE_COLOR,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: FutureBuilder<CategoryDetail>(
-                    future: fetchCategory(widget.catcode),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) print(snapshot.error);
-
-                      return snapshot.hasData
-                          ? CategoryFuture(catDetail: snapshot.data, zone: 1)
-                          : Center(child: CircularProgressIndicator());
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: FutureBuilder<List<ProductBrandList>>(
-                    future: fetchBrandList(widget.catcode),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) print(snapshot.error);
-
-                      return snapshot.hasData
-                          ? BrandWidget(brandList: snapshot.data)
-                          : Center(child: CircularProgressIndicator());
-                    },
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    FlatButton(
-                      padding: EdgeInsets.all(0),
-                      onPressed: () {
-                        setState(() {
-                          bnd = [];
-                        });
-                      },
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: (screenSize.width * 0.75) / 2,
-                        height: (screenSize.height / 100) * 6.5,
-                        decoration: BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(16),
-                          ),
-                        ),
-                        child: Text(
-                          'รีเซ็ต',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    FlatButton(
-                      padding: EdgeInsets.all(0),
-                      onPressed: () {
-                        setState(() {
-                          Navigator.pop(context);
-                        });
-                      },
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: (screenSize.width * 0.75) / 2,
-                        height: (screenSize.height / 100) * 6.5,
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                        ),
-                        child: Text(
-                          'เสร็จสิ้น',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
       body: Builder(
         builder: (ctx) => Container(
           height: double.maxFinite,
@@ -382,7 +228,6 @@ class _CategoryPageState extends State<CategoryPage> {
                                 ],
                               ),
                             ),
-                            _buildGroupIconFuture()
                           ],
                         )),
                     content: Container(
@@ -441,52 +286,12 @@ class _CategoryPageState extends State<CategoryPage> {
                                     );
                                   }).toList(),
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Scaffold.of(ctx).openEndDrawer();
-                                  },
-                                  child: Row(
-                                    children: <Widget>[
-                                      Icon(Icons.filter_list,
-                                          color: Colors.white),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'แบรนด์',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
                               ],
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: FutureBuilder<CategoryDetail>(
-                                future: fetchCategory(widget.catcode),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasError) print(snapshot.error);
-
-                                  return snapshot.hasData
-                                      ? CategoryFuture(
-                                          catDetail: snapshot.data,
-                                          zone: 0,
-                                        )
-                                      : Center(
-                                          child: CircularProgressIndicator());
-                                },
-                              ),
-                            ),
-                          ),
                           FutureBuilder<List<ProductList>>(
-                            future: fetchProductList(
-                                widget.catcode, selectOrderby, bnd),
+                            future:
+                                fetchProductList(widget.bndcode, selectOrderby),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) print(snapshot.error);
 
@@ -508,47 +313,32 @@ class _CategoryPageState extends State<CategoryPage> {
       ),
     );
   }
-
-  FutureBuilder<List<ProductGroup>> _buildGroupIconFuture() {
-    return FutureBuilder<List<ProductGroup>>(
-      future: fetchProductGroup(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
-
-        return snapshot.hasData
-            ? GroupIconList(
-                groupList: snapshot.data,
-              )
-            : Center(child: CircularProgressIndicator());
-      },
-    );
-  }
 }
 
-class CategoryFuture extends StatelessWidget {
-  final CategoryDetail catDetail;
-  final int zone;
-
-  CategoryFuture({Key key, this.catDetail, this.zone}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    // TODO: implement build
-    (AppLocalizations.of(context).locale.toString() == 'th')
-        ? catName = catDetail.XVCatName_th
-        : catName = catDetail.XVCatName_en;
-
-    return Text(
-      catName,
-      style: TextStyle(
-        fontSize: (screenSize.width / 100) * 5.5,
-        color: (zone == 1) ? Colors.white : Colors.black,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-}
+//class CategoryFuture extends StatelessWidget {
+//  final CategoryDetail catDetail;
+//  final int zone;
+//
+//  CategoryFuture({Key key, this.catDetail, this.zone}) : super(key: key);
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    var screenSize = MediaQuery.of(context).size;
+//    // TODO: implement build
+//    (AppLocalizations.of(context).locale.toString() == 'th')
+//        ? catName = catDetail.XVCatName_th
+//        : catName = catDetail.XVCatName_en;
+//
+//    return Text(
+//      catName,
+//      style: TextStyle(
+//        fontSize: (screenSize.width / 100) * 5.5,
+//        color: (zone == 1) ? Colors.white : Colors.black,
+//        fontWeight: FontWeight.bold,
+//      ),
+//    );
+//  }
+//}
 
 // ignore: must_be_immutable
 class ProductGrid extends StatefulWidget {
@@ -576,8 +366,31 @@ class _ProductGridState extends State<ProductGrid> {
   Widget build(BuildContext context) {
     // TODO: implement build
     int row = widget.productList.length;
+
+    if (row > 0) {
+      (AppLocalizations.of(context).locale.toString() == 'th')
+          ? bndName = widget.productList[0].XVBndName_th
+          : bndName = widget.productList[0].XVBndName_en;
+    } else {
+      bndName = "";
+    }
+
     return Column(
       children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              bndName,
+              style: TextStyle(
+                fontSize: (screenSize.width / 100) * 5.5,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
         Container(
           width: double.infinity,
           height: ((row / 3).ceil() * (screenSize.width / 3)) * 3,
@@ -653,138 +466,6 @@ class _ProductGridState extends State<ProductGrid> {
           ),
         ),
       ],
-    );
-  }
-}
-
-// ignore: must_be_immutable
-class GroupIconList extends StatelessWidget {
-  Size screenSize = globalScreen;
-  final List<ProductGroup> groupList;
-
-  GroupIconList({Key key, this.groupList}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Container(
-      width: double.infinity,
-      height: ((groupList.length / 5.75).ceil() * (screenSize.width / 5.75)),
-      margin: EdgeInsets.only(
-          left: (screenSize.width * 0.025), right: (screenSize.width * 0.025)),
-      padding: EdgeInsets.only(
-          left: (screenSize.width * 0.025), right: (screenSize.width * 0.025)),
-      child: ListView.builder(
-        itemCount: groupList.length,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => HomeApp(1, index)),
-                  (Route<dynamic> route) => false);
-            },
-            child: Container(
-              width: ((groupList.length / 6.25).ceil() *
-                  (screenSize.width / 6.25)),
-              margin: EdgeInsets.only(right: (screenSize.width * 0.025)),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    width: ((groupList.length / 10.25).ceil() *
-                        (screenSize.width / 10.25)),
-                    height: ((groupList.length / 12.25).ceil() *
-                        (screenSize.width / 12.25)),
-                    margin: EdgeInsets.only(top: (screenSize.height * 0.0125)),
-                    alignment: Alignment.topCenter,
-                    child: Image.network(
-                      Constant.MAIN_URL_ASSETS + groupList[index].XVGrpIconFile,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    child: Text(
-                      (AppLocalizations.of(context).locale.toString() == 'th')
-                          ? groupList[index].XVGrpName_th
-                          : groupList[index].XVGrpName_en,
-                      style: TextStyle(fontSize: 10),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// ignore: must_be_immutable
-class BrandWidget extends StatelessWidget {
-  Size screenSize = globalScreen;
-  final List<ProductBrandList> brandList;
-
-  BrandWidget({Key key, this.brandList}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Wrap(
-      spacing: 5.0,
-      runSpacing: 5.0,
-      children: <Widget>[
-        for (var i = 0; i < brandList.length; i++)
-          filterChipWidget(
-              chipName: brandList[i].XVBndName_en,
-              chipCode: brandList[i].XVBndCode),
-      ],
-    );
-  }
-}
-
-// ignore: camel_case_types
-class filterChipWidget extends StatefulWidget {
-  final String chipName;
-  final String chipCode;
-
-  filterChipWidget({Key key, this.chipName, this.chipCode}) : super(key: key);
-
-  @override
-  _filterChipWidgetState createState() => _filterChipWidgetState();
-}
-
-// ignore: camel_case_types
-class _filterChipWidgetState extends State<filterChipWidget> {
-  var _isSelected = false;
-
-  @override
-  Widget build(BuildContext context) {
-    var a = widget.chipCode;
-    int isFound = bnd.indexOf(a);
-    return FilterChip(
-      label: Text(widget.chipName),
-      labelStyle: TextStyle(
-          color: Color(0xff6200ee),
-          fontSize: 16.0,
-          fontWeight: FontWeight.bold),
-      selected: (isFound != -1) ? true : _isSelected,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30.0),
-      ),
-      backgroundColor: Color(0xffededed),
-      onSelected: (isSelected) {
-        setState(() {
-          _isSelected = isSelected;
-          (_isSelected)
-              ? bnd.add(widget.chipCode)
-              : bnd.remove(widget.chipCode);
-          print(bnd);
-        });
-      },
-      selectedColor: Color(0xffeadffd),
     );
   }
 }

@@ -1,12 +1,18 @@
 import 'dart:convert';
+import 'package:alphadealdemo/src/bloc/database_bloc.dart';
 import 'package:alphadealdemo/src/locale/app_localization.dart';
-import 'package:alphadealdemo/src/myapp.dart';
+import 'package:alphadealdemo/src/models/cart.dart';
 import 'package:alphadealdemo/src/pages/about_page.dart';
+import 'package:alphadealdemo/src/pages/cart_page.dart';
 import 'package:alphadealdemo/src/pages/contact_page.dart';
 import 'package:alphadealdemo/src/pages/donut_page.dart';
+import 'package:alphadealdemo/src/pages/product_brand.dart';
+import 'package:alphadealdemo/src/pages/product_detail_page.dart';
 import 'package:alphadealdemo/src/pages/subgroup_page.dart';
-import 'package:alphadealdemo/src/pages/me_page.dart';
+import 'package:alphadealdemo/src/pages/profile_page.dart';
+import 'package:alphadealdemo/src/pages/wishlist_page.dart';
 import 'package:alphadealdemo/src/services/app_language.dart';
+import 'package:alphadealdemo/src/services/databases.dart';
 import 'package:intl/intl.dart';
 import 'package:alphadealdemo/src/models/home.dart';
 import 'package:alphadealdemo/src/utils/constant.dart';
@@ -15,14 +21,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sticky_headers/sticky_headers/widget.dart';
 import 'package:http/http.dart' as http;
+
+import 'model_detail_page.dart';
 
 var globalScreen;
 final formatCurrency = new NumberFormat.currency(locale: "th", symbol: "");
 int intitialDonut = 0;
+int pageNavigate = 0;
+var globalCuscode;
 
 class HomeApp extends StatefulWidget {
+  final int intitialNavigate;
+  final int intitialHomeDonut;
+
+  HomeApp(this.intitialNavigate, this.intitialHomeDonut);
+
   @override
   _HomeAppState createState() => _HomeAppState();
 }
@@ -58,6 +74,13 @@ class _HomeAppState extends State<HomeApp> {
 
   @override
   void initState() {
+    setState(() {
+      (widget.intitialNavigate != null)
+          ? _selectedPage = widget.intitialNavigate
+          : _selectedPage = _selectedPage;
+      pageNavigate = _selectedPage;
+      intitialDonut = widget.intitialHomeDonut;
+    });
     super.initState();
   }
 
@@ -155,6 +178,16 @@ class HomePage extends StatefulWidget {
   }
 }
 
+Future<bool> checkIsLogin() async {
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  return preferences.getBool("isLogin") ?? false;
+}
+
+Future<String> getClientId() async {
+  String a = await DBProvider.db.getClientId();
+  return a ?? false;
+}
+
 // fetch Group Icon data
 Future<List<ProductGroup>> fetchProductGroup() async {
   final url = Constant.MAIN_URL_SERVICES + 'pdt_group';
@@ -217,13 +250,41 @@ List<Brand> parseBrand(String responseBody) {
   return parsed.map<Brand>((json) => Brand.fromJson(json)).toList();
 }
 
+// fetch Slide data
+Future<int> fetchWishlistCount(String cuscode) async {
+  final url =
+      Constant.URL_FRONT + 'wishlist_app/?app=pdts&XVConCode=' + cuscode;
+  final response = await http.get(url);
+  return parseWishListCount(response.body);
+}
+
+int parseWishListCount(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  List<CartQuery> a =
+      parsed.map<CartQuery>((json) => CartQuery.fromJson(json)).toList();
+  return a.length;
+}
+
 class _HomePageState extends State<HomePage> {
   ScrollController _scrollController;
+  final bloc = CartBloc();
+  final userBloc = ClientsBloc();
+
+  void goReParent() {
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    bloc.dispose();
+    userBloc.dispose();
+    super.dispose();
   }
 
   @override
@@ -729,7 +790,10 @@ class _HomePageState extends State<HomePage> {
         if (snapshot.hasError) print(snapshot.error);
 
         return snapshot.hasData
-            ? GroupList(groupList: snapshot.data)
+            ? GroupList(
+                groupList: snapshot.data,
+                goToDonut: widget.goToDonut,
+              )
             : Center(child: CircularProgressIndicator());
       },
     );
@@ -1141,6 +1205,7 @@ class _HomePageState extends State<HomePage> {
         return snapshot.hasData
             ? BestSellerList(
                 bestSellerList: snapshot.data,
+                goReParent: goReParent,
               )
             : Center(child: CircularProgressIndicator());
       },
@@ -1313,6 +1378,7 @@ class _HomePageState extends State<HomePage> {
         return snapshot.hasData
             ? NewProductList(
                 newProductList: snapshot.data,
+                goReParent: goReParent,
               )
             : Center(child: CircularProgressIndicator());
       },
@@ -1424,6 +1490,18 @@ class _HomePageState extends State<HomePage> {
               child: Stack(
                 children: <Widget>[
                   IconButton(
+                    onPressed: () async {
+                      var isLogin = await checkIsLogin();
+                      (isLogin)
+                          ? Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CartPage(),
+                              ),
+                            ).then((value) => setState(() {}))
+                          : Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/profile', (Route<dynamic> route) => false);
+                    },
                     icon: Icon(
                       Icons.shopping_cart,
                       color: Colors.black,
@@ -1431,29 +1509,18 @@ class _HomePageState extends State<HomePage> {
                     ),
                     padding: EdgeInsets.only(bottom: 0.5),
                   ),
-                  Positioned(
-                    right: 4,
-                    top: 4,
-                    child: Container(
-                      padding: EdgeInsets.all(1),
-                      decoration: new BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      constraints: BoxConstraints(
-                        minWidth: 14,
-                        minHeight: 14,
-                      ),
-                      child: Text(
-                        '1',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 8,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  )
+                  FutureBuilder(
+                    future: checkIsLogin(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data == true) {
+                          return _buildNotiCart();
+                        }
+                        return SizedBox();
+                      }
+                      return SizedBox();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -1463,6 +1530,22 @@ class _HomePageState extends State<HomePage> {
               child: Stack(
                 children: <Widget>[
                   IconButton(
+                    onPressed: () async {
+                      var isLogin = await checkIsLogin();
+                      if (isLogin) {
+                        var cusCode = await getClientId();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                WishListPage(cuscode: cusCode),
+                          ),
+                        ).then((value) => setState(() {}));
+                      } else {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/profile', (Route<dynamic> route) => false);
+                      }
+                    },
                     icon: Icon(
                       Icons.favorite,
                       color: Colors.black,
@@ -1470,29 +1553,19 @@ class _HomePageState extends State<HomePage> {
                     ),
                     padding: EdgeInsets.only(bottom: 0.5),
                   ),
-                  Positioned(
-                    right: 2,
-                    top: 4,
-                    child: Container(
-                      padding: EdgeInsets.all(1),
-                      decoration: new BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      constraints: BoxConstraints(
-                        minWidth: 14,
-                        minHeight: 14,
-                      ),
-                      child: Text(
-                        '1',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 8,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  )
+                  FutureBuilder(
+                    future: DBProvider.db.getClientId(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data != null &&
+                            snapshot.hasError == false) {
+                          return _buildNotiWishlist(snapshot.data);
+                        }
+                        return SizedBox();
+                      }
+                      return SizedBox();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -1645,6 +1718,81 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  FutureBuilder _buildNotiWishlist(String cuscode) {
+    return FutureBuilder(
+      future: fetchWishlistCount(cuscode),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if ((snapshot.data != null || snapshot.hasError == false) &&
+              snapshot.data != 0) {
+            return Positioned(
+              right: 4,
+              top: 4,
+              child: Container(
+                padding: EdgeInsets.all(1),
+                decoration: new BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                constraints: BoxConstraints(
+                  minWidth: 14,
+                  minHeight: 14,
+                ),
+                child: Text(
+                  snapshot.data.toString(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 8,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+          return SizedBox();
+        }
+        return SizedBox();
+      },
+    );
+  }
+
+  FutureBuilder _buildNotiCart() {
+    return FutureBuilder(
+      future: DBProvider.db.getCountNotiCart(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data != 0 || snapshot.hasError == false) {
+            return Positioned(
+              right: 4,
+              top: 4,
+              child: Container(
+                padding: EdgeInsets.all(1),
+                decoration: new BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                constraints: BoxConstraints(
+                  minWidth: 14,
+                  minHeight: 14,
+                ),
+                child: Text(
+                  snapshot.data.toString(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 8,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+          return SizedBox();
+        }
+        return SizedBox();
+      },
+    );
+  }
+
   Container _buildFullLogo() {
     var scWidth = MediaQuery.of(context).size.width;
     if (scWidth < 760) {
@@ -1666,8 +1814,14 @@ class _HomePageState extends State<HomePage> {
 class BestSellerList extends StatelessWidget {
   Size screenSize = globalScreen;
   final List<BestSeller> bestSellerList;
+  final Function goReParent;
 
-  BestSellerList({Key key, this.bestSellerList}) : super(key: key);
+  BestSellerList({Key key, this.bestSellerList, this.goReParent})
+      : super(key: key);
+
+  void goRefresh() {
+    goReParent();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1687,48 +1841,70 @@ class BestSellerList extends StatelessWidget {
               Radius.circular(5),
             ),
           ),
-          child: Column(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(left: 12, right: 12),
-                padding: EdgeInsets.only(top: 12),
-                width: double.infinity,
-                height: 45,
-                child: Text(
-                  (AppLocalizations.of(context).locale.toString() == 'th')
-                      ? bestSellerList[index].XVPdtName_th
-                      : bestSellerList[index].XVPdtName_en,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Container(
-                width: 75,
-                height: 75,
-                child: Image.network(
-                  (Constant.MAIN_URL_ASSETS + bestSellerList[index].XVImgFile),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 12, right: 12),
-                padding: EdgeInsets.only(bottom: 12),
-                width: double.infinity,
-                height: 30,
-                child: Text(
-                  formatCurrency.format(
-                      double.parse(bestSellerList[index].XFPdtStdPrice)
-                          .toDouble()),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
+          child: GestureDetector(
+            onTap: () {
+              var isModel = bestSellerList[index].XBPdtIsModel;
+              var pdtCode = bestSellerList[index].XVPdtCode;
+              var mdlCode = bestSellerList[index].XVModCode;
+              (isModel == '0')
+                  ? Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ProductDetailPage(pdtCode: pdtCode),
+                      ),
+                    ).then((value) => goRefresh())
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ModelDetailPage(mdlCode: mdlCode),
+                      ),
+                    ).then((value) => goRefresh());
+            },
+            child: Column(
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(left: 12, right: 12),
+                  padding: EdgeInsets.only(top: 12),
+                  width: double.infinity,
+                  height: 45,
+                  child: Text(
+                    (AppLocalizations.of(context).locale.toString() == 'th')
+                        ? bestSellerList[index].XVPdtName_th
+                        : bestSellerList[index].XVPdtName_en,
+                    style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: Colors.red),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              )
-            ],
+                Container(
+                  width: 75,
+                  height: 75,
+                  child: Image.network(
+                    (Constant.MAIN_URL_ASSETS +
+                        bestSellerList[index].XVImgFile),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(left: 12, right: 12),
+                  padding: EdgeInsets.only(bottom: 12),
+                  width: double.infinity,
+                  height: 30,
+                  child: Text(
+                    formatCurrency.format(
+                        double.parse(bestSellerList[index].XFPdtStdPrice)
+                            .toDouble()),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red),
+                  ),
+                )
+              ],
+            ),
           ),
         );
       },
@@ -1738,10 +1914,17 @@ class BestSellerList extends StatelessWidget {
 
 // ignore: must_be_immutable
 class NewProductList extends StatelessWidget {
-  Size screenSize = globalScreen;
   final List<NewProduct> newProductList;
+  final Function goReParent;
 
-  NewProductList({Key key, this.newProductList}) : super(key: key);
+  NewProductList({Key key, this.newProductList, this.goReParent})
+      : super(key: key);
+
+  void goRefresh() {
+    goReParent();
+  }
+
+  Size screenSize = globalScreen;
 
   @override
   Widget build(BuildContext context) {
@@ -1761,48 +1944,70 @@ class NewProductList extends StatelessWidget {
               Radius.circular(5),
             ),
           ),
-          child: Column(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(left: 12, right: 12),
-                padding: EdgeInsets.only(top: 12),
-                width: double.infinity,
-                height: 45,
-                child: Text(
-                  (AppLocalizations.of(context).locale.toString() == 'th')
-                      ? newProductList[index].XVPdtName_th
-                      : newProductList[index].XVPdtName_en,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Container(
-                width: 75,
-                height: 75,
-                child: Image.network(
-                  (Constant.MAIN_URL_ASSETS + newProductList[index].XVImgFile),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 12, right: 12),
-                padding: EdgeInsets.only(bottom: 12),
-                width: double.infinity,
-                height: 30,
-                child: Text(
-                  formatCurrency.format(
-                      double.parse(newProductList[index].XFPdtStdPrice)
-                          .toDouble()),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
+          child: GestureDetector(
+            onTap: () {
+              var isModel = newProductList[index].XBPdtIsModel;
+              var pdtCode = newProductList[index].XVPdtCode;
+              var mdlCode = newProductList[index].XVModCode;
+              (isModel == '0')
+                  ? Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ProductDetailPage(pdtCode: pdtCode),
+                      ),
+                    ).then((value) => goRefresh())
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ModelDetailPage(mdlCode: mdlCode),
+                      ),
+                    ).then((value) => goRefresh());
+            },
+            child: Column(
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(left: 12, right: 12),
+                  padding: EdgeInsets.only(top: 12),
+                  width: double.infinity,
+                  height: 45,
+                  child: Text(
+                    (AppLocalizations.of(context).locale.toString() == 'th')
+                        ? newProductList[index].XVPdtName_th
+                        : newProductList[index].XVPdtName_en,
+                    style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: Colors.red),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              )
-            ],
+                Container(
+                  width: 75,
+                  height: 75,
+                  child: Image.network(
+                    (Constant.MAIN_URL_ASSETS +
+                        newProductList[index].XVImgFile),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(left: 12, right: 12),
+                  padding: EdgeInsets.only(bottom: 12),
+                  width: double.infinity,
+                  height: 30,
+                  child: Text(
+                    formatCurrency.format(
+                        double.parse(newProductList[index].XFPdtStdPrice)
+                            .toDouble()),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red),
+                  ),
+                )
+              ],
+            ),
           ),
         );
       },
@@ -1919,17 +2124,26 @@ class _GroupIconListState extends State<GroupIconList> {
 }
 
 // ignore: must_be_immutable
-class GroupList extends StatelessWidget {
-  Size screenSize = globalScreen;
+class GroupList extends StatefulWidget {
   final List<ProductGroup> groupList;
   final List<SubGroup> subList;
+  final Function goToDonut;
 
-  GroupList({Key key, this.groupList, this.subList}) : super(key: key);
+  GroupList({Key key, this.groupList, this.subList, this.goToDonut})
+      : super(key: key);
+
+  @override
+  _GroupListState createState() => _GroupListState();
+}
+
+class _GroupListState extends State<GroupList> {
+  Size screenSize = globalScreen;
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    int row = groupList.length;
+    int row = widget.groupList.length;
+
     return Column(
       children: <Widget>[
         for (int i = 0; i < row; i++)
@@ -1941,8 +2155,8 @@ class GroupList extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Hexcolor(groupList[i].XVGrpColor1),
-                      Hexcolor(groupList[i].XVGrpColor2)
+                      Hexcolor(widget.groupList[i].XVGrpColor1),
+                      Hexcolor(widget.groupList[i].XVGrpColor2)
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -1959,9 +2173,10 @@ class GroupList extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            Hexcolor(groupList[i].XVGrpColor3),
+                            Hexcolor(widget.groupList[i].XVGrpColor3),
                             Color(int.parse(
-                                    groupList[i].XVGrpColor3.substring(1, 7),
+                                    widget.groupList[i].XVGrpColor3
+                                        .substring(1, 7),
                                     radix: 16) +
                                 0)
                           ],
@@ -1975,7 +2190,7 @@ class GroupList extends StatelessWidget {
                             ' ' +
                             (i + 1).toString(),
                         style: TextStyle(
-                          color: Hexcolor(groupList[i].XVGrpColor2),
+                          color: Hexcolor(widget.groupList[i].XVGrpColor2),
                           fontWeight: FontWeight.bold,
                           fontSize: (screenSize.width / 100) * 3.75,
                         ),
@@ -1985,7 +2200,7 @@ class GroupList extends StatelessWidget {
                       bottom: (screenSize.width / 100) * 5,
                       left: (screenSize.width / 100) * 4,
                       child: Text(
-                        groupList[i].XVGrpName_th,
+                        widget.groupList[i].XVGrpName_th,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -1997,7 +2212,7 @@ class GroupList extends StatelessWidget {
                       left: (screenSize.width / 100) * 4,
                       bottom: (screenSize.width / 100) * 1,
                       child: Text(
-                        groupList[i].XVGrpName_en,
+                        widget.groupList[i].XVGrpName_en,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: (screenSize.width / 100) * 2.75,
@@ -2008,7 +2223,8 @@ class GroupList extends StatelessWidget {
                       right: 0,
                       top: 4,
                       child: Image.network(
-                        Constant.MAIN_URL_ASSETS + groupList[i].XVGrpBannerFile,
+                        Constant.MAIN_URL_ASSETS +
+                            widget.groupList[i].XVGrpBannerFile,
                         alignment: Alignment.topRight,
                         width: screenSize.width * .6,
                       ),
@@ -2018,27 +2234,29 @@ class GroupList extends StatelessWidget {
               ),
               Container(
                 width: double.infinity,
-                height: ((groupList[i].subgroup.length / 3).ceil() *
+                height: ((widget.groupList[i].subgroup.length / 3).ceil() *
                     (screenSize.width / 3)),
                 child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                   ),
                   physics: new NeverScrollableScrollPhysics(),
-                  itemCount: groupList[i].subgroup.length,
+                  itemCount: widget.groupList[i].subgroup.length,
                   scrollDirection: Axis.vertical,
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
-                        var subcode = groupList[i].subgroup[index].XVSubCode;
-                        var grpcode = groupList[i].XVGrpCode;
+                        var subcode =
+                            widget.groupList[i].subgroup[index].XVSubCode;
+                        var grpcode = widget.groupList[i].XVGrpCode;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => SubGroupPage(
-                                    subcode: subcode,
-                                    grpcode: grpcode,
-                                  )),
+                            builder: (context) => SubGroupPage(
+                              subcode: subcode,
+                              grpcode: grpcode,
+                            ),
+                          ),
                         );
                       },
                       child: Container(
@@ -2046,13 +2264,14 @@ class GroupList extends StatelessWidget {
                         child: Stack(
                           children: <Widget>[
                             Image.network(Constant.MAIN_URL_ASSETS +
-                                groupList[i].XVGrpBoxFile),
+                                widget.groupList[i].XVGrpBoxFile),
                             Container(
                               padding: EdgeInsets.all(12),
                               alignment: Alignment.bottomCenter,
                               child: Image.network(
                                 Constant.MAIN_URL_ASSETS +
-                                    groupList[i].subgroup[index].XVImgFile,
+                                    widget
+                                        .groupList[i].subgroup[index].XVImgFile,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -2060,20 +2279,24 @@ class GroupList extends StatelessWidget {
                               top: 8,
                               left: 8,
                               child: Text(
-                                groupList[i].subgroup[index].XVSubName_th,
+                                widget
+                                    .groupList[i].subgroup[index].XVSubName_th,
                                 style: TextStyle(
                                     fontSize: 10,
-                                    color: Hexcolor(groupList[i].XVGrpColor5)),
+                                    color: Hexcolor(
+                                        widget.groupList[i].XVGrpColor5)),
                               ),
                             ),
                             Positioned(
                               top: 24,
                               left: 8,
                               child: Text(
-                                groupList[i].subgroup[index].XVSubName_en,
+                                widget
+                                    .groupList[i].subgroup[index].XVSubName_en,
                                 style: TextStyle(
                                     fontSize: 10,
-                                    color: Hexcolor(groupList[i].XVGrpColor5)),
+                                    color: Hexcolor(
+                                        widget.groupList[i].XVGrpColor5)),
                               ),
                             ),
                           ],
@@ -2114,8 +2337,16 @@ class BrandList extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              var a = brandList[index].XVBndCode;
-              print('you pressed : $a ');
+              var bndcode = brandList[index].XVBndCode;
+              // print('you pressed : $bndcode ');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductBrandPage(
+                    bndcode: bndcode,
+                  ),
+                ),
+              );
             },
             child: Container(
               decoration: BoxDecoration(
@@ -2130,9 +2361,13 @@ class BrandList extends StatelessWidget {
                   ]),
               margin: EdgeInsets.all(4),
               padding: EdgeInsets.all(2),
-              child: Image.network(
-                Constant.MAIN_URL_ASSETS + brandList[index].XVImgFile,
-                fit: BoxFit.cover,
+              child: Container(
+                color: Colors.white,
+                padding: EdgeInsets.all(2),
+                child: Image.network(
+                  Constant.MAIN_URL_ASSETS + brandList[index].XVImgFile,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           );

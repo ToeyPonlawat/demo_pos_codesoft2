@@ -140,14 +140,18 @@ class Slide {
 }
 
 class NewProduct {
+  final String XBPdtIsModel;
   final String XVPdtCode;
+  final String XVModCode;
   final String XVPdtName_th;
   final String XVPdtName_en;
   final String XFPdtStdPrice;
   final String XVImgFile;
 
   NewProduct({
+    this.XBPdtIsModel,
     this.XVPdtCode,
+    this.XVModCode,
     this.XVPdtName_th,
     this.XVPdtName_en,
     this.XFPdtStdPrice,
@@ -156,7 +160,9 @@ class NewProduct {
 
   factory NewProduct.fromJson(Map<String, dynamic> parsedJson) {
     return NewProduct(
+      XBPdtIsModel: parsedJson['XBPdtIsModel'],
       XVPdtCode: parsedJson['XVPdtCode'],
+      XVModCode: parsedJson['XVModCode'],
       XVPdtName_th: parsedJson['XVPdtName_th'],
       XVPdtName_en: parsedJson['XVPdtName_en'],
       XFPdtStdPrice: parsedJson['XFPdtStdPrice'],
@@ -166,14 +172,18 @@ class NewProduct {
 }
 
 class BestSeller {
+  final String XBPdtIsModel;
   final String XVPdtCode;
+  final String XVModCode;
   final String XVPdtName_th;
   final String XVPdtName_en;
   final String XFPdtStdPrice;
   final String XVImgFile;
 
   BestSeller({
+    this.XBPdtIsModel,
     this.XVPdtCode,
+    this.XVModCode,
     this.XVPdtName_th,
     this.XVPdtName_en,
     this.XFPdtStdPrice,
@@ -182,7 +192,9 @@ class BestSeller {
 
   factory BestSeller.fromJson(Map<String, dynamic> parsedJson) {
     return BestSeller(
+      XBPdtIsModel: parsedJson['XBPdtIsModel'],
       XVPdtCode: parsedJson['XVPdtCode'],
+      XVModCode: parsedJson['XVModCode'],
       XVPdtName_th: parsedJson['XVPdtName_th'],
       XVPdtName_en: parsedJson['XVPdtName_en'],
       XFPdtStdPrice: parsedJson['XFPdtStdPrice'],
