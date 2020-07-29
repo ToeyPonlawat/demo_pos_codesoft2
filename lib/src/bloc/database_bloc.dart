@@ -74,6 +74,11 @@ class CartBloc {
 //    getClients();
   }
 
+  edit(Cart cart) {
+    DBProvider.db.editCart(cart);
+//    getClients();
+  }
+
   getCountNoti() {
     DBProvider.db.getCountNotiCart();
   }

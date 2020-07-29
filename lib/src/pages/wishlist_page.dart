@@ -33,8 +33,9 @@ Future<String> getClientId() async {
 // fetch Slide data
 Future<int> fetchWishlistCount(String cuscode) async {
   final url =
-      Constant.URL_FRONT + 'wishlist_app/?app=pdts&XVConCode=' + cuscode;
+      Constant.MAIN_URL_API + 'wishlist_app/?app=pdts&XVConCode=' + cuscode;
   final response = await http.get(url);
+  //print(url);
   return parseWishListCount(response.body);
 }
 
@@ -62,7 +63,7 @@ List<ProductGroup> parseProductGroup(String responseBody) {
 // fetch Product list in Category
 Future<List<ProductList>> fetchProductList(
     String catcode, String orderBy, List brand) async {
-  String url = Constant.URL_FRONT + 'wishlist_app';
+  String url = Constant.MAIN_URL_API + 'wishlist_app';
   if (orderBy != null && orderBy.length > 0) {
     url += '?app=pdts&XVConCode=$catcode&selectOrderby=$orderBy';
   } else {
@@ -90,7 +91,7 @@ List<ProductList> parseProductList(String responseBody) {
 // fetch Product list in Category
 Future<List<ProductBrandList>> fetchBrandList(String cuscode) async {
   String url =
-      Constant.URL_FRONT + 'wishlist_app?app=brands&XVConCode=$cuscode';
+      Constant.MAIN_URL_API + 'wishlist_app?app=brands&XVConCode=$cuscode';
 
   //print(url);
   final response = await http.get(url);
@@ -99,6 +100,7 @@ Future<List<ProductBrandList>> fetchBrandList(String cuscode) async {
 
 List<ProductBrandList> parseBrandList(String responseBody) {
   final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  //print(parsed);
   return parsed
       .map<ProductBrandList>((json) => ProductBrandList.fromJson(json))
       .toList();
@@ -149,6 +151,7 @@ class _WishListPageState extends State<WishListPage> {
   Widget build(BuildContext context) {
     selectOrderby = globalOrder;
     var screenSize = MediaQuery.of(context).size;
+    var scWidth = screenSize.width;
     globalScreen = screenSize;
     return Scaffold(
       endDrawer: SafeArea(
@@ -420,7 +423,7 @@ class _WishListPageState extends State<WishListPage> {
                             ],
                           ),
                         ),
-                        _buildGroupIconFuture()
+                        (scWidth < 600) ? _buildGroupIconFuture() : SizedBox()
                       ],
                     )),
                 content: Container(
@@ -685,6 +688,7 @@ class _ProductGridState extends State<ProductGrid> {
   Widget build(BuildContext context) {
     // TODO: implement build
     int row = widget.productList.length;
+    //print(row);
     return Column(
       children: <Widget>[
         Container(

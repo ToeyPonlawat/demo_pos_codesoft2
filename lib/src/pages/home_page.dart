@@ -33,6 +33,93 @@ int intitialDonut = 0;
 int pageNavigate = 0;
 var globalCuscode;
 
+Future<bool> checkIsLogin() async {
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  return preferences.getBool("isLogin") ?? false;
+}
+
+Future<String> getClientId() async {
+  String a = await DBProvider.db.getClientId();
+  return a ?? false;
+}
+
+// fetch Group Icon data
+Future<List<ProductGroup>> fetchProductGroup() async {
+  final url = Constant.MAIN_URL_SERVICES + 'pdt_group';
+  final response = await http.get(url);
+  return parseProductGroup(response.body);
+}
+
+List<ProductGroup> parseProductGroup(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  return parsed
+      .map<ProductGroup>((json) => ProductGroup.fromJson(json))
+      .toList();
+}
+
+// fetch Slide data
+Future<List<Slide>> fetchSlide() async {
+  final url = Constant.MAIN_URL_SERVICES + 'slides';
+  final response = await http.get(url);
+  return parseSlide(response.body);
+}
+
+List<Slide> parseSlide(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  return parsed.map<Slide>((json) => Slide.fromJson(json)).toList();
+}
+
+// fetch New Product data
+Future<List<NewProduct>> fetchNewProduct() async {
+  final url = Constant.MAIN_URL_SERVICES + 'pdt_new';
+  final response = await http.get(url);
+  return parseNewProduct(response.body);
+}
+
+List<NewProduct> parseNewProduct(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  return parsed.map<NewProduct>((json) => NewProduct.fromJson(json)).toList();
+}
+
+// fetch Best Seller data
+Future<List<BestSeller>> fetchBestSeller() async {
+  final url = Constant.MAIN_URL_SERVICES + 'pdt_best';
+  final response = await http.get(url);
+  return parseBestSeller(response.body);
+}
+
+List<BestSeller> parseBestSeller(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  return parsed.map<BestSeller>((json) => BestSeller.fromJson(json)).toList();
+}
+
+// fetch Brand data
+Future<List<Brand>> fetchBrand() async {
+  final url = Constant.MAIN_URL_SERVICES + 'pdt_brand';
+  final response = await http.get(url);
+  return parseBrand(response.body);
+}
+
+List<Brand> parseBrand(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  return parsed.map<Brand>((json) => Brand.fromJson(json)).toList();
+}
+
+// fetch Slide data
+Future<int> fetchWishlistCount(String cuscode) async {
+  final url =
+      Constant.MAIN_URL_API + 'wishlist_app/?app=pdts&XVConCode=' + cuscode;
+  final response = await http.get(url);
+  return parseWishListCount(response.body);
+}
+
+int parseWishListCount(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  List<CartQuery> a =
+  parsed.map<CartQuery>((json) => CartQuery.fromJson(json)).toList();
+  return a.length;
+}
+
 class HomeApp extends StatefulWidget {
   final int intitialNavigate;
   final int intitialHomeDonut;
@@ -176,93 +263,6 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() {
     return _HomePageState();
   }
-}
-
-Future<bool> checkIsLogin() async {
-  SharedPreferences preferences = await SharedPreferences.getInstance();
-  return preferences.getBool("isLogin") ?? false;
-}
-
-Future<String> getClientId() async {
-  String a = await DBProvider.db.getClientId();
-  return a ?? false;
-}
-
-// fetch Group Icon data
-Future<List<ProductGroup>> fetchProductGroup() async {
-  final url = Constant.MAIN_URL_SERVICES + 'pdt_group';
-  final response = await http.get(url);
-  return parseProductGroup(response.body);
-}
-
-List<ProductGroup> parseProductGroup(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  return parsed
-      .map<ProductGroup>((json) => ProductGroup.fromJson(json))
-      .toList();
-}
-
-// fetch Slide data
-Future<List<Slide>> fetchSlide() async {
-  final url = Constant.MAIN_URL_SERVICES + 'slides';
-  final response = await http.get(url);
-  return parseSlide(response.body);
-}
-
-List<Slide> parseSlide(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  return parsed.map<Slide>((json) => Slide.fromJson(json)).toList();
-}
-
-// fetch New Product data
-Future<List<NewProduct>> fetchNewProduct() async {
-  final url = Constant.MAIN_URL_SERVICES + 'pdt_new';
-  final response = await http.get(url);
-  return parseNewProduct(response.body);
-}
-
-List<NewProduct> parseNewProduct(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  return parsed.map<NewProduct>((json) => NewProduct.fromJson(json)).toList();
-}
-
-// fetch Best Seller data
-Future<List<BestSeller>> fetchBestSeller() async {
-  final url = Constant.MAIN_URL_SERVICES + 'pdt_best';
-  final response = await http.get(url);
-  return parseBestSeller(response.body);
-}
-
-List<BestSeller> parseBestSeller(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  return parsed.map<BestSeller>((json) => BestSeller.fromJson(json)).toList();
-}
-
-// fetch Brand data
-Future<List<Brand>> fetchBrand() async {
-  final url = Constant.MAIN_URL_SERVICES + 'pdt_brand';
-  final response = await http.get(url);
-  return parseBrand(response.body);
-}
-
-List<Brand> parseBrand(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  return parsed.map<Brand>((json) => Brand.fromJson(json)).toList();
-}
-
-// fetch Slide data
-Future<int> fetchWishlistCount(String cuscode) async {
-  final url =
-      Constant.URL_FRONT + 'wishlist_app/?app=pdts&XVConCode=' + cuscode;
-  final response = await http.get(url);
-  return parseWishListCount(response.body);
-}
-
-int parseWishListCount(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  List<CartQuery> a =
-      parsed.map<CartQuery>((json) => CartQuery.fromJson(json)).toList();
-  return a.length;
 }
 
 class _HomePageState extends State<HomePage> {
@@ -547,217 +547,74 @@ class _HomePageState extends State<HomePage> {
 
   StickyHeader _buildStickyHeader(Size screenSize) {
     var scWidth = MediaQuery.of(context).size.width;
-    if (scWidth < 760) {
-      return StickyHeader(
-        overlapHeaders: false,
-        header: Container(
-          padding: EdgeInsets.only(bottom: 0, top: 0),
-          decoration: BoxDecoration(
-              color: Color.fromRGBO(253, 250, 254, 1.0),
-              shape: BoxShape.rectangle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black38,
-                  offset: const Offset(0.0, 6.0),
-                  blurRadius: 3.0,
-                  spreadRadius: 1.0,
-                ),
-              ]),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _buildDefaultSearch(screenSize),
-              _buildGroupIconFuture(),
-            ],
-          ),
-        ),
-        content: Column(
-          children: <Widget>[
-            _buildSlideImage(screenSize),
-            _buildNewProduct(screenSize),
-            _buildBestSeller(screenSize),
-            Container(
-              width: double.infinity,
-              height: 30,
-              color: Colors.transparent,
-              alignment: Alignment.topLeft,
-              margin: EdgeInsets.only(top: 10, left: 1),
-              child: Container(
-                width: screenSize.width / 3,
-                height: 40,
-                decoration: BoxDecoration(
-                    color: Color.fromRGBO(60, 8, 87, 1),
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        topLeft: Radius.circular(20))),
-                alignment: Alignment.center,
-                child: Text(
-                  AppLocalizations.of(context)
-                      .translate('home_label_categories'),
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: (scWidth / 100) * 4,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Container(
-              height: 3,
-              width: double.infinity,
-              color: Color.fromRGBO(60, 8, 87, 1),
-            ),
-            _buildProductGroupFuture(),
-            SizedBox(
-              height: screenSize.height * 0.025,
-            ),
-            _buildBrandFuture(),
-            _buildBottomBanner(),
-            Padding(padding: EdgeInsets.only(bottom: 55)),
-          ],
-        ),
-      );
-    } else {
-      return StickyHeader(
-        overlapHeaders: false,
-        header: Container(
-          padding: EdgeInsets.only(bottom: 10),
-          decoration: BoxDecoration(
+
+    return StickyHeader(
+      overlapHeaders: false,
+      header: Container(
+        padding: EdgeInsets.only(bottom: 0, top: 0),
+        decoration: BoxDecoration(
             color: Color.fromRGBO(253, 250, 254, 1.0),
-          ),
-          child: Column(
-            children: <Widget>[
-              _buildDefaultSearch(screenSize),
-              _buildGroupIcons(screenSize),
-              Container(
-                width: double.infinity,
-                height: 5,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    colors: [
-                      Color.fromRGBO(250, 250, 250, 1.0),
-                      Color.fromRGBO(255, 255, 255, 0.5)
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-        content: Column(
+            shape: BoxShape.rectangle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black38,
+                offset: const Offset(0.0, 6.0),
+                blurRadius: 3.0,
+                spreadRadius: 1.0,
+              ),
+            ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            _buildSlideImage(screenSize),
-            _buildNewProduct(screenSize),
-            _buildBestSeller(screenSize),
-            Container(
-              width: double.infinity,
-              height: 60,
-              color: Colors.transparent,
-              alignment: Alignment.topLeft,
-              margin: EdgeInsets.only(top: 20, left: 1),
-              child: Container(
-                width: screenSize.width / 4,
-                height: 60,
-                decoration: BoxDecoration(
-                    color: Color.fromRGBO(60, 8, 87, 1),
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(40),
-                        topLeft: Radius.circular(40))),
-                alignment: Alignment.center,
-                child: Text(
-                  'หมวดหมู่สินค้า',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Container(
-              height: 3,
-              width: double.infinity,
-              color: Color.fromRGBO(60, 8, 87, 1),
-            ),
-            Container(
-              width: double.infinity,
-              height: 200,
-              margin: EdgeInsets.only(top: 20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color.fromRGBO(140, 97, 158, 1.0),
-                    Color.fromRGBO(87, 17, 116, 1.0)
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    width: screenSize.width / 3,
-                    height: 50,
-                    padding: EdgeInsets.only(top: 5, left: 32),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color.fromRGBO(217, 217, 217, 1.0),
-                          Color.fromRGBO(255, 255, 255, 0)
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                    ),
-                    child: Text(
-                      'กลุ่มที่ 1',
-                      style: TextStyle(
-                          color: Color.fromRGBO(87, 17, 116, 1.0),
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 60,
-                    left: 32,
-                    child: Text(
-                      'ฮาร์ดแวร์ทูล',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 28,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 32,
-                    bottom: 20,
-                    child: Text(
-                      'Tools & Hardware',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 5,
-                    child: Image.asset(
-                      'assets/images/g01.png',
-                      alignment: Alignment.topRight,
-                      width: screenSize.width * .63,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildDefaultSearch(screenSize),
+            _buildGroupIconFuture(),
           ],
         ),
-      );
-    }
+      ),
+      content: Column(
+        children: <Widget>[
+          _buildSlideImage(screenSize),
+          _buildNewProduct(screenSize),
+          _buildBestSeller(screenSize),
+          Container(
+            width: double.infinity,
+            height: 50,
+            color: Colors.transparent,
+            alignment: Alignment.topLeft,
+            margin: EdgeInsets.only(top: 20, left: 1),
+            child: Container(
+              width: screenSize.width / 3,
+              height: 45,
+              decoration: BoxDecoration(
+                  color: Color.fromRGBO(60, 8, 87, 1),
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(20))),
+              alignment: Alignment.center,
+              child: Text(
+                AppLocalizations.of(context).translate('home_label_categories'),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: (scWidth / 100) * 4,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          Container(
+            height: 3,
+            width: double.infinity,
+            color: Color.fromRGBO(60, 8, 87, 1),
+          ),
+          _buildProductGroupFuture(),
+          SizedBox(
+            height: screenSize.height * 0.025,
+          ),
+          _buildBrandFuture(),
+          _buildBottomBanner(),
+          Padding(padding: EdgeInsets.only(bottom: 55)),
+        ],
+      ),
+    );
   }
 
   FutureBuilder<List<Brand>> _buildBrandFuture() {
@@ -800,248 +657,29 @@ class _HomePageState extends State<HomePage> {
   }
 
   FutureBuilder<List<ProductGroup>> _buildGroupIconFuture() {
+    var scWidth = MediaQuery.of(context).size.width;
+
     return FutureBuilder<List<ProductGroup>>(
       future: fetchProductGroup(),
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
-
-        return snapshot.hasData
-            ? GroupIconList(
-                groupList: snapshot.data,
-                goToDonut: widget.goToDonut,
-              )
-            : Center(child: CircularProgressIndicator());
+        if (scWidth < 600) {
+          return snapshot.hasData
+              ? GroupIconList(
+                  groupList: snapshot.data,
+                  goToDonut: widget.goToDonut,
+                )
+              : Center(child: CircularProgressIndicator());
+        } else {
+          return SizedBox();
+        }
       },
     );
   }
 
-  Container _buildGroupIcons(Size screenSize) {
-    var scWidth = MediaQuery.of(context).size.width;
-    if (scWidth < 760) {
-      return Container(
-        width: double.infinity,
-        padding: EdgeInsets.only(left: 20, right: 20, top: 20),
-        color: Color.fromRGBO(253, 250, 254, 1.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            GestureDetector(
-              onTap: () {},
-              child: Container(
-                width: 60,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/images/g1.png',
-                      width: 30,
-                      height: 30,
-                    ),
-                    Text(
-                      'Hardware Tools',
-                      style: TextStyle(fontSize: 12, color: Colors.black),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              child: Container(
-                width: 60,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/images/g2.png',
-                      width: 30,
-                      height: 30,
-                    ),
-                    Text(
-                      'Measurement',
-                      style: TextStyle(fontSize: 12, color: Colors.black),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              child: Container(
-                width: 60,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/images/g3.png',
-                      width: 30,
-                      height: 30,
-                    ),
-                    Text(
-                      'Lighting',
-                      style: TextStyle(fontSize: 12, color: Colors.black),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              width: 60,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/images/g4.png',
-                    width: 30,
-                    height: 30,
-                  ),
-                  Text(
-                    'Machinery',
-                    style: TextStyle(fontSize: 12, color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 60,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/images/g5.png',
-                    width: 30,
-                    height: 30,
-                  ),
-                  Text(
-                    'Paint &',
-                    style: TextStyle(fontSize: 12, color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    } else {
-      return Container(
-        width: double.infinity,
-        padding: EdgeInsets.only(left: 60, right: 60, top: 20),
-        color: Color.fromRGBO(253, 250, 254, 1.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              width: 120,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/images/g1.png',
-                    width: 45,
-                    height: 45,
-                  ),
-                  Text(
-                    'Hardware Tools',
-                    style: TextStyle(fontSize: 18, color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 120,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/images/g2.png',
-                    width: 45,
-                    height: 45,
-                  ),
-                  Text(
-                    'Measurement',
-                    style: TextStyle(fontSize: 18, color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 120,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/images/g3.png',
-                    width: 45,
-                    height: 45,
-                  ),
-                  Text(
-                    'Lighting',
-                    style: TextStyle(fontSize: 18, color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 120,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/images/g4.png',
-                    width: 45,
-                    height: 45,
-                  ),
-                  Text(
-                    'Machinery',
-                    style: TextStyle(fontSize: 18, color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 120,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/images/g5.png',
-                    width: 45,
-                    height: 45,
-                  ),
-                  Text(
-                    'Paint &',
-                    style: TextStyle(fontSize: 18, color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
   Container _buildBestSeller(Size screenSize) {
     var scWidth = MediaQuery.of(context).size.width;
-    if (scWidth < 760) {
+    if (scWidth < 600) {
       return Container(
         width: double.infinity,
         height: 220,
@@ -1106,9 +744,9 @@ class _HomePageState extends State<HomePage> {
     } else {
       return Container(
         width: double.infinity,
-        height: 420,
-        padding: EdgeInsets.only(left: 20, top: 0, right: 20, bottom: 0),
-        margin: EdgeInsets.only(top: 20),
+        height: 240,
+        padding: EdgeInsets.only(left: 10, top: 0, right: 10, bottom: 0),
+        margin: EdgeInsets.only(top: 10),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -1124,72 +762,44 @@ class _HomePageState extends State<HomePage> {
             Align(
               alignment: Alignment.topLeft,
               child: Container(
-                padding: EdgeInsets.only(top: 10, left: 10),
+                padding: EdgeInsets.only(top: 5, left: 5),
                 child: Row(
                   children: <Widget>[
                     Text(
                       'Best Seller',
                       style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold),
+                        color: Colors.black,
+                        fontSize: (scWidth / 100) * 5,
+                      ),
                     ),
                     Padding(
-                      padding: EdgeInsets.all(8),
+                      padding: EdgeInsets.all(4),
                     ),
                     Icon(
                       Icons.fiber_manual_record,
-                      size: 20,
+                      size: 10,
                       color: Colors.black,
                     ),
                     Padding(
-                      padding: EdgeInsets.all(8),
+                      padding: EdgeInsets.all(4),
                     ),
                     Text(
                       'สินค้าขายดี',
                       style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold),
+                        color: Colors.black,
+                        fontSize: (scWidth / 100) * 5,
+                      ),
                     )
                   ],
                 ),
               ),
             ),
             Container(
-              width: double.infinity,
-              alignment: Alignment.bottomLeft,
-              margin: EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    width: (screenSize.width / 4),
-                    height: 320,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                  ),
-                  Container(
-                    width: (screenSize.width / 4),
-                    height: 320,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                  ),
-                  Container(
-                    width: (screenSize.width / 4),
-                    height: 320,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                  )
-                ],
-              ),
-            ),
+                width: double.infinity,
+                height: 150,
+                alignment: Alignment.bottomLeft,
+                margin: EdgeInsets.only(left: 4, right: 4, top: 20),
+                child: _buildBestSellerFuture()),
           ],
         ),
       );
@@ -1214,7 +824,7 @@ class _HomePageState extends State<HomePage> {
 
   Container _buildNewProduct(Size screenSize) {
     var scWidth = MediaQuery.of(context).size.width;
-    if (scWidth < 760) {
+    if (scWidth < 600) {
       return Container(
         width: double.infinity,
         height: 220,
@@ -1279,9 +889,8 @@ class _HomePageState extends State<HomePage> {
     } else {
       return Container(
         width: double.infinity,
-        height: 420,
-        padding: EdgeInsets.only(left: 20, top: 0, right: 20, bottom: 0),
-        margin: EdgeInsets.only(top: 20),
+        height: 240,
+        padding: EdgeInsets.only(left: 10, top: 0, right: 10, bottom: 0),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -1297,22 +906,22 @@ class _HomePageState extends State<HomePage> {
             Align(
               alignment: Alignment.topLeft,
               child: Container(
-                padding: EdgeInsets.only(top: 10, left: 10),
+                padding: EdgeInsets.only(top: 5, left: 5),
                 child: Row(
                   children: <Widget>[
                     Text(
                       'New Product',
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontSize: (scWidth / 100) * 5,
+                      ),
                     ),
                     Padding(
-                      padding: EdgeInsets.all(8),
+                      padding: EdgeInsets.all(4),
                     ),
                     Icon(
                       Icons.fiber_manual_record,
-                      size: 20,
+                      size: 10,
                       color: Colors.white,
                     ),
                     Padding(
@@ -1321,9 +930,9 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       'สินค้าใหม่',
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontSize: (scWidth / 100) * 5,
+                      ),
                     )
                   ],
                 ),
@@ -1331,37 +940,10 @@ class _HomePageState extends State<HomePage> {
             ),
             Container(
               width: double.infinity,
+              height: 150,
               alignment: Alignment.topCenter,
-              margin: EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    width: (screenSize.width / 4),
-                    height: 320,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                  ),
-                  Container(
-                    width: (screenSize.width / 4),
-                    height: 320,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                  ),
-                  Container(
-                    width: (screenSize.width / 4),
-                    height: 320,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                  )
-                ],
-              ),
+              margin: EdgeInsets.only(left: 4, right: 4, top: 20),
+              child: _buildNewProductFuture(),
             ),
           ],
         ),
@@ -1387,47 +969,40 @@ class _HomePageState extends State<HomePage> {
 
   Container _buildSlideImage(Size screenSize) {
     var scWidth = MediaQuery.of(context).size.width;
-    if (scWidth < 760) {
+    if (scWidth < 600) {
       return Container(
-          width: double.infinity,
-          height: screenSize.height * 0.225,
-          color: Colors.white,
-          child: FutureBuilder<List<Slide>>(
-            future: fetchSlide(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
+        width: double.infinity,
+        height: screenSize.height * 0.225,
+        color: Colors.white,
+        child: FutureBuilder<List<Slide>>(
+          future: fetchSlide(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) print(snapshot.error);
 
-              return snapshot.hasData
-                  ? SlideCarouselList(
-                      slideList: snapshot.data,
-                    )
-                  : Center(child: CircularProgressIndicator());
-            },
-          ));
+            return snapshot.hasData
+                ? SlideCarouselList(
+                    slideList: snapshot.data,
+                  )
+                : SizedBox();
+          },
+        ),
+      );
     } else {
       return Container(
         width: double.infinity,
-        height: 420,
+        height: screenSize.height * 0.3,
         color: Colors.white,
-        child: Carousel(
-          boxFit: BoxFit.fitWidth,
-          autoplay: false,
-          animationCurve: Curves.fastOutSlowIn,
-          animationDuration: Duration(milliseconds: 5000),
-          dotSize: 10.0,
-          dotIncreasedColor: Colors.grey,
-          dotBgColor: Colors.transparent,
-          dotPosition: DotPosition.bottomCenter,
-          dotVerticalPadding: 5.0,
-          showIndicator: true,
-          images: [
-            ExactAssetImage(
-              'assets/images/6-02.png',
-            ),
-            ExactAssetImage('assets/images/6-02.png'),
-            ExactAssetImage('assets/images/6-02.png'),
-            ExactAssetImage('assets/images/6-02.png'),
-          ],
+        child: FutureBuilder<List<Slide>>(
+          future: fetchSlide(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) print(snapshot.error);
+
+            return snapshot.hasData
+                ? SlideCarouselList(
+                    slideList: snapshot.data,
+                  )
+                : SizedBox();
+          },
         ),
       );
     }
@@ -1435,7 +1010,7 @@ class _HomePageState extends State<HomePage> {
 
   Container _buildDefaultSearch(Size screenSize) {
     var scWidth = MediaQuery.of(context).size.width;
-    if (scWidth < 760) {
+    if (scWidth < 600) {
       return Container(
         width: double.infinity,
         height: (screenSize.height / 100) * 7.5,
@@ -1575,43 +1150,43 @@ class _HomePageState extends State<HomePage> {
     } else {
       return Container(
         width: double.infinity,
-        height: (screenSize.height * 0.060),
-        padding: EdgeInsets.only(top: 5),
+        height: (screenSize.height * 0.070),
+        padding: EdgeInsets.only(top: 5, bottom: 12),
         color: Color.fromRGBO(253, 250, 254, 1.0),
         child: Row(
           children: <Widget>[
             Container(
-              margin: EdgeInsets.only(left: 36, top: 12, right: 36, bottom: 0),
+              margin: EdgeInsets.only(left: 12, top: 12, right: 18, bottom: 0),
               child: Image.asset(
                 'assets/images/logo-full.png',
               ),
             ),
             Container(
-              width: (screenSize.width * 0.50),
-              margin: EdgeInsets.only(right: 20),
+              width: (screenSize.width * 0.5),
+              margin: EdgeInsets.only(right: 12),
               alignment: Alignment.bottomCenter,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Container(
                     width: (screenSize.width * 0.42),
-                    height: 60,
+                    height: 40,
                     decoration: BoxDecoration(border: Border.all(width: 1)),
                     child: TextField(
                       autofocus: false,
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: 16),
                       decoration: InputDecoration(
                         fillColor: Colors.white,
                         hintText: 'ชื่อสินค้า/รหัสสินค้า/ประเภทสินค้า',
                         border: InputBorder.none,
                         contentPadding:
-                            EdgeInsets.only(bottom: 0, left: 20, top: 10),
+                            EdgeInsets.only(bottom: 5, left: 10, top: 5),
                       ),
                     ),
                   ),
                   Container(
                     width: (screenSize.width * 0.08),
-                    height: 60,
+                    height: 40,
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(width: 1),
@@ -1624,7 +1199,7 @@ class _HomePageState extends State<HomePage> {
                       icon: Icon(
                         Icons.search,
                         color: Colors.black,
-                        size: 45,
+                        size: 36,
                       ),
                       padding: EdgeInsets.only(bottom: 0.5),
                     ),
@@ -1633,82 +1208,89 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Container(
-              width: (screenSize.width * 0.055),
+              padding: EdgeInsets.only(top: 12),
+              width: (screenSize.width * 0.075),
               alignment: Alignment.centerRight,
-              padding: EdgeInsets.only(top: 10),
               child: Stack(
                 children: <Widget>[
                   IconButton(
+                    onPressed: () async {
+                      var isLogin = await checkIsLogin();
+                      (isLogin)
+                          ? Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CartPage(),
+                              ),
+                            ).then((value) => setState(() {}))
+                          : Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/profile', (Route<dynamic> route) => false);
+                    },
                     icon: Icon(
                       Icons.shopping_cart,
                       color: Colors.black,
-                      size: 50,
+                      size: 30,
                     ),
                     padding: EdgeInsets.only(bottom: 0.5),
                   ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: EdgeInsets.all(1),
-                      decoration: new BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      constraints: BoxConstraints(
-                        minWidth: 28,
-                        minHeight: 28,
-                      ),
-                      child: Text(
-                        '1',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  )
+                  FutureBuilder(
+                    future: checkIsLogin(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data == true) {
+                          return _buildNotiCart();
+                        }
+                        return SizedBox();
+                      }
+                      return SizedBox();
+                    },
+                  ),
                 ],
               ),
             ),
             Container(
-              width: (screenSize.width * 0.055),
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.only(top: 10),
+              padding: EdgeInsets.only(top: 12),
+              width: (screenSize.width * 0.075),
+              alignment: Alignment.centerLeft,
               child: Stack(
                 children: <Widget>[
                   IconButton(
+                    onPressed: () async {
+                      var isLogin = await checkIsLogin();
+                      if (isLogin) {
+                        var cusCode = await getClientId();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                WishListPage(cuscode: cusCode),
+                          ),
+                        ).then((value) => setState(() {}));
+                      } else {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/profile', (Route<dynamic> route) => false);
+                      }
+                    },
                     icon: Icon(
                       Icons.favorite,
                       color: Colors.black,
-                      size: 50,
+                      size: 30,
                     ),
                     padding: EdgeInsets.only(bottom: 0.5),
                   ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: EdgeInsets.all(0),
-                      decoration: new BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      constraints: BoxConstraints(
-                        minWidth: 28,
-                        minHeight: 28,
-                      ),
-                      child: Text(
-                        '1',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  )
+                  FutureBuilder(
+                    future: DBProvider.db.getClientId(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data != null &&
+                            snapshot.hasError == false) {
+                          return _buildNotiWishlist(snapshot.data);
+                        }
+                        return SizedBox();
+                      }
+                      return SizedBox();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -1795,7 +1377,7 @@ class _HomePageState extends State<HomePage> {
 
   Container _buildFullLogo() {
     var scWidth = MediaQuery.of(context).size.width;
-    if (scWidth < 760) {
+    if (scWidth < 600) {
       return Container(
         width: double.infinity,
         padding: EdgeInsets.only(left: 36, top: 12, right: 36, bottom: 0),
@@ -1831,9 +1413,11 @@ class BestSellerList extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, index) {
         return Container(
-          width: (screenSize.width / 3.5),
+          width: (screenSize.width < 600)
+              ? (screenSize.width / 3.5)
+              : (screenSize.width / 5.55),
           margin: EdgeInsets.only(
-            right: (screenSize.width * 0.0325),
+            right: (screenSize.width * 0.0125),
           ),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -1934,9 +1518,11 @@ class NewProductList extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, index) {
         return Container(
-          width: (screenSize.width / 3.5),
+          width: (screenSize.width < 600)
+              ? (screenSize.width / 3.5)
+              : (screenSize.width / 5.55),
           margin: EdgeInsets.only(
-            right: (screenSize.width * 0.0325),
+            right: (screenSize.width * 0.0125),
           ),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -2137,179 +1723,349 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
-  Size screenSize = globalScreen;
+  //Size screenSize = globalScreen;
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     int row = widget.groupList.length;
-
-    return Column(
-      children: <Widget>[
-        for (int i = 0; i < row; i++)
-          Column(
-            children: <Widget>[
-              Container(
-                width: double.infinity,
-                height: 70,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Hexcolor(widget.groupList[i].XVGrpColor1),
-                      Hexcolor(widget.groupList[i].XVGrpColor2)
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+    var screenSize = MediaQuery.of(context).size;
+    var scWidth = screenSize.width;
+    if (scWidth < 600) {
+      return Column(
+        children: <Widget>[
+          for (int i = 0; i < row; i++)
+            Column(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Hexcolor(widget.groupList[i].XVGrpColor1),
+                        Hexcolor(widget.groupList[i].XVGrpColor2)
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
                   ),
-                ),
-                child: Stack(
-                  children: <Widget>[
-                    Container(
-                      width: screenSize.width / 3,
-                      height: 25,
-                      padding: EdgeInsets.only(
-                          top: (screenSize.width / 100),
-                          left: (screenSize.width / 100) * 4),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Hexcolor(widget.groupList[i].XVGrpColor3),
-                            Color(int.parse(
-                                    widget.groupList[i].XVGrpColor3
-                                        .substring(1, 7),
-                                    radix: 16) +
-                                0)
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context)
-                                .translate('general_label_group') +
-                            ' ' +
-                            (i + 1).toString(),
-                        style: TextStyle(
-                          color: Hexcolor(widget.groupList[i].XVGrpColor2),
-                          fontWeight: FontWeight.bold,
-                          fontSize: (screenSize.width / 100) * 3.75,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: (screenSize.width / 100) * 5,
-                      left: (screenSize.width / 100) * 4,
-                      child: Text(
-                        widget.groupList[i].XVGrpName_th,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: (screenSize.width / 100) * 2.75,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: (screenSize.width / 100) * 4,
-                      bottom: (screenSize.width / 100) * 1,
-                      child: Text(
-                        widget.groupList[i].XVGrpName_en,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: (screenSize.width / 100) * 2.75,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: 4,
-                      child: Image.network(
-                        Constant.MAIN_URL_ASSETS +
-                            widget.groupList[i].XVGrpBannerFile,
-                        alignment: Alignment.topRight,
-                        width: screenSize.width * .6,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: ((widget.groupList[i].subgroup.length / 3).ceil() *
-                    (screenSize.width / 3)),
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                  ),
-                  physics: new NeverScrollableScrollPhysics(),
-                  itemCount: widget.groupList[i].subgroup.length,
-                  scrollDirection: Axis.vertical,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        var subcode =
-                            widget.groupList[i].subgroup[index].XVSubCode;
-                        var grpcode = widget.groupList[i].XVGrpCode;
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SubGroupPage(
-                              subcode: subcode,
-                              grpcode: grpcode,
-                            ),
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                        width: screenSize.width / 3,
+                        height: 25,
+                        padding: EdgeInsets.only(
+                            top: (screenSize.width / 100),
+                            left: (screenSize.width / 100) * 4),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Hexcolor(widget.groupList[i].XVGrpColor3),
+                              Color(int.parse(
+                                      widget.groupList[i].XVGrpColor3
+                                          .substring(1, 7),
+                                      radix: 16) +
+                                  0)
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
                           ),
-                        );
-                      },
-                      child: Container(
-                        margin: EdgeInsets.all(4),
-                        child: Stack(
-                          children: <Widget>[
-                            Image.network(Constant.MAIN_URL_ASSETS +
-                                widget.groupList[i].XVGrpBoxFile),
-                            Container(
-                              padding: EdgeInsets.all(12),
-                              alignment: Alignment.bottomCenter,
-                              child: Image.network(
-                                Constant.MAIN_URL_ASSETS +
-                                    widget
-                                        .groupList[i].subgroup[index].XVImgFile,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Positioned(
-                              top: 8,
-                              left: 8,
-                              child: Text(
-                                widget
-                                    .groupList[i].subgroup[index].XVSubName_th,
-                                style: TextStyle(
-                                    fontSize: 10,
-                                    color: Hexcolor(
-                                        widget.groupList[i].XVGrpColor5)),
-                              ),
-                            ),
-                            Positioned(
-                              top: 24,
-                              left: 8,
-                              child: Text(
-                                widget
-                                    .groupList[i].subgroup[index].XVSubName_en,
-                                style: TextStyle(
-                                    fontSize: 10,
-                                    color: Hexcolor(
-                                        widget.groupList[i].XVGrpColor5)),
-                              ),
-                            ),
-                          ],
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context)
+                                  .translate('general_label_group') +
+                              ' ' +
+                              (i + 1).toString(),
+                          style: TextStyle(
+                            color: Hexcolor(widget.groupList[i].XVGrpColor2),
+                            fontWeight: FontWeight.bold,
+                            fontSize: (screenSize.width / 100) * 3.75,
+                          ),
                         ),
                       ),
-                    );
-                  },
+                      Positioned(
+                        bottom: (screenSize.width / 100) * 5,
+                        left: (screenSize.width / 100) * 4,
+                        child: Text(
+                          widget.groupList[i].XVGrpName_th,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: (screenSize.width / 100) * 2.75,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: (screenSize.width / 100) * 4,
+                        bottom: (screenSize.width / 100) * 1,
+                        child: Text(
+                          widget.groupList[i].XVGrpName_en,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: (screenSize.width / 100) * 2.75,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 4,
+                        child: Image.network(
+                          Constant.MAIN_URL_ASSETS +
+                              widget.groupList[i].XVGrpBannerFile,
+                          alignment: Alignment.topRight,
+                          width: screenSize.width * .6,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-      ],
-    );
+                Container(
+                  width: double.infinity,
+                  height: ((widget.groupList[i].subgroup.length / 3).ceil() *
+                      (screenSize.width / 3)),
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                    ),
+                    physics: new NeverScrollableScrollPhysics(),
+                    itemCount: widget.groupList[i].subgroup.length,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          var subcode =
+                              widget.groupList[i].subgroup[index].XVSubCode;
+                          var grpcode = widget.groupList[i].XVGrpCode;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SubGroupPage(
+                                subcode: subcode,
+                                grpcode: grpcode,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(4),
+                          child: Stack(
+                            children: <Widget>[
+                              Image.network(Constant.MAIN_URL_ASSETS +
+                                  widget.groupList[i].XVGrpBoxFile),
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                alignment: Alignment.bottomCenter,
+                                child: Image.network(
+                                  Constant.MAIN_URL_ASSETS +
+                                      widget.groupList[i].subgroup[index]
+                                          .XVImgFile,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Positioned(
+                                top: 8,
+                                left: 8,
+                                child: Text(
+                                  widget.groupList[i].subgroup[index]
+                                      .XVSubName_th,
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Hexcolor(
+                                          widget.groupList[i].XVGrpColor5)),
+                                ),
+                              ),
+                              Positioned(
+                                top: 24,
+                                left: 8,
+                                child: Text(
+                                  widget.groupList[i].subgroup[index]
+                                      .XVSubName_en,
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Hexcolor(
+                                          widget.groupList[i].XVGrpColor5)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+        ],
+      );
+    } else {
+      return Column(
+        children: <Widget>[
+          for (int i = 0; i < row; i++)
+            Column(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Hexcolor(widget.groupList[i].XVGrpColor1),
+                        Hexcolor(widget.groupList[i].XVGrpColor2)
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                        width: screenSize.width / 3,
+                        height: 40,
+                        padding: EdgeInsets.only(
+                            top: (screenSize.width / 100),
+                            left: (screenSize.width / 100) * 2),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Hexcolor(widget.groupList[i].XVGrpColor3),
+                              Color(int.parse(
+                                  widget.groupList[i].XVGrpColor3
+                                      .substring(1, 7),
+                                  radix: 16) +
+                                  0)
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context)
+                              .translate('general_label_group') +
+                              ' ' +
+                              (i + 1).toString(),
+                          style: TextStyle(
+                            color: Hexcolor(widget.groupList[i].XVGrpColor2),
+                            fontWeight: FontWeight.bold,
+                            fontSize: (screenSize.width / 100) * 3.75,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: (screenSize.width / 100) * 6,
+                        left: (screenSize.width / 100) * 2,
+                        child: Text(
+                          widget.groupList[i].XVGrpName_th,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: (screenSize.width / 100) * 2.75,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: (screenSize.width / 100) * 2,
+                        bottom: (screenSize.width / 100) * 2,
+                        child: Text(
+                          widget.groupList[i].XVGrpName_en,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: (screenSize.width / 100) * 2.75,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: (screenSize.width / 100) * 2,
+                        child: Image.network(
+                          Constant.MAIN_URL_ASSETS +
+                              widget.groupList[i].XVGrpBannerFile,
+                          alignment: Alignment.topRight,
+                          width: screenSize.width * .6,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: ((widget.groupList[i].subgroup.length / 4).ceil() *
+                      (screenSize.width / 4)),
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                    ),
+                    physics: new NeverScrollableScrollPhysics(),
+                    itemCount: widget.groupList[i].subgroup.length,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          var subcode =
+                              widget.groupList[i].subgroup[index].XVSubCode;
+                          var grpcode = widget.groupList[i].XVGrpCode;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SubGroupPage(
+                                subcode: subcode,
+                                grpcode: grpcode,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(4),
+                          child: Stack(
+                            children: <Widget>[
+                              Image.network(Constant.MAIN_URL_ASSETS +
+                                  widget.groupList[i].XVGrpBoxFile),
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                alignment: Alignment.bottomCenter,
+                                child: Image.network(
+                                  Constant.MAIN_URL_ASSETS +
+                                      widget
+                                          .groupList[i].subgroup[index].XVImgFile,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Positioned(
+                                top: 8,
+                                left: 8,
+                                child: Text(
+                                  widget
+                                      .groupList[i].subgroup[index].XVSubName_th,
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Hexcolor(
+                                          widget.groupList[i].XVGrpColor5)),
+                                ),
+                              ),
+                              Positioned(
+                                top: 24,
+                                left: 8,
+                                child: Text(
+                                  widget
+                                      .groupList[i].subgroup[index].XVSubName_en,
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Hexcolor(
+                                          widget.groupList[i].XVGrpColor5)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+        ],
+      );
+    }
   }
 }
 

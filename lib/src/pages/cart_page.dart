@@ -19,7 +19,7 @@ var qty = [];
 
 // fetch Group Icon data
 Future<List<CartQuery>> fetchCartList(List pdt) async {
-  var url = Constant.URL_FRONT + 'product_cart?';
+  var url = Constant.MAIN_URL_API + 'product_cart?';
   for (var i = 0; i < pdt.length; i++) {
     (i >= 1) ? url += '&pdtcode[$i]=' + pdt[i] : url += 'pdtcode[$i]=' + pdt[i];
   }
@@ -47,7 +47,7 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
-//    Cart n = new Cart(XVBarCode: '2229637982109',XVBarName: 'test',XVBarNameOth: 'test',XFBarRetPri1: '12.00',XIQty: 1);
+//    Cart n = new Cart(XVBarCode: '2229637982123',XVBarName: '',XVBarNameOth: '',XFBarRetPri1: '153.00',XIQty: 2);
 //    bloc.add(n);
     //bloc.delete('2229637982116');
     var screenSize = MediaQuery.of(context).size;
@@ -333,7 +333,7 @@ class _CartShowState extends State<CartShow> {
                                             XFBarRetPri1: '',
                                             XVBarNameOth: '',
                                             XVBarName: '');
-                                        bloc.add(n);
+                                        bloc.edit(n);
                                         //print(qty);
                                         return;
                                       }
@@ -397,7 +397,7 @@ class _CartShowState extends State<CartShow> {
                                           XFBarRetPri1: '',
                                           XVBarNameOth: '',
                                           XVBarName: '');
-                                      bloc.add(n);
+                                      bloc.edit(n);
                                       return;
                                     },
                                     child: Container(
@@ -523,7 +523,7 @@ class _CartShowState extends State<CartShow> {
                       XFBarRetPri1: '',
                       XVBarNameOth: '',
                       XVBarName: '');
-                  bloc.add(n);
+                  bloc.edit(n);
                   Navigator.pop(context);
                   return;
                 },

@@ -86,6 +86,40 @@ class DBProvider {
     var table =
         await db.rawQuery("SELECT * FROM Cart WHERE XVBarCode = '$barCode'");
     if (table.length > 0) {
+      //print(table.elementAt(0).values.last);
+      int oldQty = table.elementAt(0).values.last;
+      int newQty = newCart.XIQty;
+      int updateQty = oldQty+newQty;
+      var raw = await db.rawUpdate(
+          'UPDATE Cart SET XIQty = ? WHERE XVBarCode = ?',
+          [updateQty, barCode]);
+      return raw;
+    } else {
+      var raw = await db.rawInsert(
+          "INSERT Into Cart (XVBarCode,XVBarName,XVBarNameOth,XFBarRetPri1,XIQty)"
+          " VALUES (?,?,?,?,?)",
+          [
+            barCode,
+            newCart.XVBarName,
+            newCart.XVBarNameOth,
+            newCart.XFBarRetPri1,
+            newCart.XIQty
+          ]);
+      return raw;
+    }
+  }
+
+  editCart(Cart newCart) async {
+    final db = await database;
+    String barCode = newCart.XVBarCode;
+    //get the biggest id in the table
+    var table =
+    await db.rawQuery("SELECT * FROM Cart WHERE XVBarCode = '$barCode'");
+    if (table.length > 0) {
+//      print(table.elementAt(0).values.last);
+//      int oldQty = table.elementAt(0).values.last;
+//      int newQty = newCart.XIQty;
+//      int updateQty = oldQty+newQty;
       var raw = await db.rawUpdate(
           'UPDATE Cart SET XIQty = ? WHERE XVBarCode = ?',
           [newCart.XIQty, barCode]);
@@ -93,7 +127,7 @@ class DBProvider {
     } else {
       var raw = await db.rawInsert(
           "INSERT Into Cart (XVBarCode,XVBarName,XVBarNameOth,XFBarRetPri1,XIQty)"
-          " VALUES (?,?,?,?,?)",
+              " VALUES (?,?,?,?,?)",
           [
             barCode,
             newCart.XVBarName,

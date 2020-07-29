@@ -1,3 +1,4 @@
+import 'package:alphadealdemo/src/bloc/database_bloc.dart';
 import 'package:alphadealdemo/src/locale/app_localization.dart';
 import 'package:alphadealdemo/src/models/cart.dart';
 import 'package:alphadealdemo/src/models/home.dart';
@@ -52,8 +53,9 @@ Future<String> getClientId() async {
 // fetch Slide data
 Future<int> fetchWishlistCount(String cuscode, String pdtCode) async {
   final url =
-      Constant.URL_FRONT + 'wishlist_app/?app=pdts&XVConCode=' + cuscode;
+      Constant.MAIN_URL_API + 'wishlist_app/?app=pdts&XVConCode=' + cuscode;
   final response = await http.get(url);
+  //print(url);
   return parseWishListCount(response.body, pdtCode);
 }
 
@@ -140,158 +142,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               children: <Widget>[
                 StickyHeader(
                   header: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(253, 250, 254, 1.0),
-                        shape: BoxShape.rectangle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black38,
-                            offset: const Offset(0.0, 6.0),
-                            blurRadius: 3.0,
-                            spreadRadius: 1.0,
-                          ),
-                        ]),
-                    width: double.infinity,
-                    height: (screenSize.height / 100) * 7.5,
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          width: (screenSize.width * 0.74),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              Container(
-                                width: (screenSize.width * 0.55),
-                                height: 40,
-                                decoration:
-                                    BoxDecoration(border: Border.all(width: 1)),
-                                child: TextField(
-                                  autofocus: false,
-                                  decoration: InputDecoration(
-                                      fillColor: Colors.white,
-                                      hintText:
-                                          'ชื่อสินค้า/รหัสสินค้า/ประเภทสินค้า',
-                                      contentPadding: EdgeInsets.only(
-                                          left: 7,
-                                          top: 5,
-                                          right: 20,
-                                          bottom: 7)),
-                                ),
-                              ),
-                              Container(
-                                width: (screenSize.width * 0.14),
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(width: 1),
-                                    top: BorderSide(width: 1),
-                                    right: BorderSide(width: 1),
-                                  ),
-                                  color: Colors.amber,
-                                ),
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.search,
-                                    color: Colors.black,
-                                    size: 30,
-                                  ),
-                                  padding: EdgeInsets.only(bottom: 0.5),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: (screenSize.width * 0.13),
-                          alignment: Alignment.centerRight,
-                          child: Stack(
-                            children: <Widget>[
-                              IconButton(
-                                onPressed: () async {
-                                  var isLogin = await checkIsLogin();
-                                  (isLogin)
-                                      ? Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => CartPage(),
-                                          ),
-                                        ).then((value) => setState(() {}))
-                                      : Navigator.of(context)
-                                          .pushNamedAndRemoveUntil('/profile',
-                                              (Route<dynamic> route) => false);
-                                },
-                                icon: Icon(
-                                  Icons.shopping_cart,
-                                  color: Colors.black,
-                                  size: 30,
-                                ),
-                                padding: EdgeInsets.only(bottom: 0.5),
-                              ),
-                              FutureBuilder(
-                                future: checkIsLogin(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    if (snapshot.data == true) {
-                                      return _buildNotiCart();
-                                    }
-                                    return SizedBox();
-                                  }
-                                  return SizedBox();
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: (screenSize.width * 0.10),
-                          alignment: Alignment.centerLeft,
-                          child: Stack(
-                            children: <Widget>[
-                              IconButton(
-                                onPressed: () async {
-                                  var isLogin = await checkIsLogin();
-                                  if (isLogin) {
-                                    var cusCode = await getClientId();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            WishListPage(cuscode: cusCode),
-                                      ),
-                                    );
-                                  } else {
-                                    Navigator.of(context)
-                                        .pushNamedAndRemoveUntil('/profile',
-                                            (Route<dynamic> route) => false);
-                                  }
-                                },
-                                icon: Icon(
-                                  Icons.favorite,
-                                  color: Colors.black,
-                                  size: 30,
-                                ),
-                                padding: EdgeInsets.only(bottom: 0.5),
-                              ),
-                              FutureBuilder(
-                                future: DBProvider.db.getClientId(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    if (snapshot.data != null &&
-                                        snapshot.hasError == false) {
-                                      return _buildNotiWishlist(snapshot.data);
-                                    }
-                                    return SizedBox();
-                                  }
-                                  return SizedBox();
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: Color.fromRGBO(253, 250, 254, 1.0),
+                          shape: BoxShape.rectangle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black38,
+                              offset: const Offset(0.0, 6.0),
+                              blurRadius: 3.0,
+                              spreadRadius: 1.0,
+                            ),
+                          ]),
+                      width: double.infinity,
+                      height: (screenSize.height / 100) * 7.5,
+                      child: _buildDefaultSearch(screenSize)),
                   content: Container(
                     width: double.infinity,
                     color: Colors.white,
@@ -320,6 +185,298 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         ),
       ),
     );
+  }
+
+  Container _buildDefaultSearch(Size screenSize) {
+    var scWidth = MediaQuery.of(context).size.width;
+    if (scWidth < 600) {
+      return Container(
+        width: double.infinity,
+        height: (screenSize.height / 100) * 7.5,
+        padding: EdgeInsets.only(top: 5),
+        child: Row(
+          children: <Widget>[
+            Container(
+              width: (screenSize.width * 0.74),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Container(
+                    width: (screenSize.width * 0.55),
+                    height: 40,
+                    decoration: BoxDecoration(border: Border.all(width: 1)),
+                    child: TextField(
+                      autofocus: false,
+                      decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          hintText: AppLocalizations.of(context)
+                              .translate('home_label_default_search'),
+                          contentPadding: EdgeInsets.only(
+                              left: 7, top: 5, right: 20, bottom: 7)),
+                    ),
+                  ),
+                  Container(
+                    width: (screenSize.width * 0.14),
+                    height: 40,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(width: 1),
+                        top: BorderSide(width: 1),
+                        right: BorderSide(width: 1),
+                      ),
+                      color: Colors.amber,
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.search,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                      padding: EdgeInsets.only(bottom: 0.5),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Container(
+              width: (screenSize.width * 0.13),
+              alignment: Alignment.centerRight,
+              child: Stack(
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () async {
+                      var isLogin = await checkIsLogin();
+                      (isLogin)
+                          ? Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CartPage(),
+                              ),
+                            ).then((value) => setState(() {}))
+                          : Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/profile', (Route<dynamic> route) => false);
+                    },
+                    icon: Icon(
+                      Icons.shopping_cart,
+                      color: Colors.black,
+                      size: 30,
+                    ),
+                    padding: EdgeInsets.only(bottom: 0.5),
+                  ),
+                  FutureBuilder(
+                    future: checkIsLogin(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data == true) {
+                          return _buildNotiCart();
+                        }
+                        return SizedBox();
+                      }
+                      return SizedBox();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: (screenSize.width * 0.10),
+              alignment: Alignment.centerLeft,
+              child: Stack(
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () async {
+                      var isLogin = await checkIsLogin();
+                      if (isLogin) {
+                        var cusCode = await getClientId();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                WishListPage(cuscode: cusCode),
+                          ),
+                        ).then((value) => setState(() {}));
+                      } else {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/profile', (Route<dynamic> route) => false);
+                      }
+                    },
+                    icon: Icon(
+                      Icons.favorite,
+                      color: Colors.black,
+                      size: 30,
+                    ),
+                    padding: EdgeInsets.only(bottom: 0.5),
+                  ),
+                  FutureBuilder(
+                    future: DBProvider.db.getClientId(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data != null &&
+                            snapshot.hasError == false) {
+                          return _buildNotiWishlist(snapshot.data);
+                        }
+                        return SizedBox();
+                      }
+                      return SizedBox();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        width: double.infinity,
+        height: (screenSize.height * 0.070),
+        padding: EdgeInsets.only(top: 5, bottom: 12),
+        color: Color.fromRGBO(253, 250, 254, 1.0),
+        child: Row(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(left: 12, top: 12, right: 18, bottom: 0),
+              child: Image.asset(
+                'assets/images/logo-full.png',
+              ),
+            ),
+            Container(
+              width: (screenSize.width * 0.5),
+              margin: EdgeInsets.only(right: 12),
+              alignment: Alignment.bottomCenter,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Container(
+                    width: (screenSize.width * 0.42),
+                    height: 40,
+                    decoration: BoxDecoration(border: Border.all(width: 1)),
+                    child: TextField(
+                      autofocus: false,
+                      style: TextStyle(fontSize: 16),
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        hintText: 'ชื่อสินค้า/รหัสสินค้า/ประเภทสินค้า',
+                        border: InputBorder.none,
+                        contentPadding:
+                            EdgeInsets.only(bottom: 5, left: 10, top: 5),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: (screenSize.width * 0.08),
+                    height: 40,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(width: 1),
+                        top: BorderSide(width: 1),
+                        right: BorderSide(width: 1),
+                      ),
+                      color: Colors.amber,
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.search,
+                        color: Colors.black,
+                        size: 36,
+                      ),
+                      padding: EdgeInsets.only(bottom: 0.5),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.only(top: 12),
+              width: (screenSize.width * 0.075),
+              alignment: Alignment.centerRight,
+              child: Stack(
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () async {
+                      var isLogin = await checkIsLogin();
+                      (isLogin)
+                          ? Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CartPage(),
+                              ),
+                            ).then((value) => setState(() {}))
+                          : Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/profile', (Route<dynamic> route) => false);
+                    },
+                    icon: Icon(
+                      Icons.shopping_cart,
+                      color: Colors.black,
+                      size: 30,
+                    ),
+                    padding: EdgeInsets.only(bottom: 0.5),
+                  ),
+                  FutureBuilder(
+                    future: checkIsLogin(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data == true) {
+                          return _buildNotiCart();
+                        }
+                        return SizedBox();
+                      }
+                      return SizedBox();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.only(top: 12),
+              width: (screenSize.width * 0.075),
+              alignment: Alignment.centerLeft,
+              child: Stack(
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () async {
+                      var isLogin = await checkIsLogin();
+                      if (isLogin) {
+                        var cusCode = await getClientId();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                WishListPage(cuscode: cusCode),
+                          ),
+                        ).then((value) => setState(() {}));
+                      } else {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/profile', (Route<dynamic> route) => false);
+                      }
+                    },
+                    icon: Icon(
+                      Icons.favorite,
+                      color: Colors.black,
+                      size: 30,
+                    ),
+                    padding: EdgeInsets.only(bottom: 0.5),
+                  ),
+                  FutureBuilder(
+                    future: DBProvider.db.getClientId(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data != null &&
+                            snapshot.hasError == false) {
+                          return _buildNotiWishlist(snapshot.data);
+                        }
+                        return SizedBox();
+                      }
+                      return SizedBox();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   FutureBuilder _buildNotiWishlist(String cuscode) {
@@ -492,6 +649,8 @@ class ProductDetailLayout extends StatefulWidget {
 }
 
 class _ProductDetailLayoutState extends State<ProductDetailLayout> {
+  final bloc = CartBloc();
+
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
@@ -712,26 +871,39 @@ class _ProductDetailLayoutState extends State<ProductDetailLayout> {
               Row(
                 children: <Widget>[
                   GestureDetector(
-                    onTap: () {
-//                                    int j = qty[i];
-//                                    if (j == 1) {
-//                                      //print(j);
-//                                      return;
-//                                    } else {
-//                                      j--;
-//                                      qty[i] = j;
-//                                      setState(() {});
-//                                      Cart n = new Cart(
-//                                          XVBarCode: widget
-//                                              .cartListShow[i].XVPdtCode,
-//                                          XIQty: j,
-//                                          XFBarRetPri1: '',
-//                                          XVBarNameOth: '',
-//                                          XVBarName: '');
-//                                      bloc.add(n);
-//                                      //print(qty);
-//                                      return;
-//                                    }
+                    onTap: () async {
+                      var isLogin = await checkIsLogin();
+                      if (isLogin == true) {
+                        var pdtCode = widget.productDetaiList.XVPdtCode;
+                        var pdtPrice = widget.productDetaiList.XFPdtStdPrice;
+                        Cart n = new Cart(
+                            XVBarCode: pdtCode,
+                            XVBarName: '',
+                            XVBarNameOth: '',
+                            XFBarRetPri1: pdtPrice,
+                            XIQty: qty);
+                        bloc.add(n);
+
+                        final snackBar = SnackBar(
+                          content: Text('เพิ่มสินค้าไปยังรถเข็นแล้ว'),
+                          action: SnackBarAction(
+                            label: "",
+                            onPressed: () {
+                              // Some code to undo the change.
+                            },
+                          ),
+                        );
+
+                        Scaffold.of(context).showSnackBar(snackBar);
+
+                        setState(() {
+                          qty = 1;
+                          widget.goRefreshParent();
+                        });
+                      } else {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/profile', (Route<dynamic> route) => false);
+                      }
                     },
                     child: Container(
                       height: 40,

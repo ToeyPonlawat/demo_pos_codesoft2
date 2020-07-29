@@ -91,6 +91,8 @@ class _MePageState extends State<MePage> {
 
   final bloc = ClientsBloc();
 
+  final cartBloc = CartBloc();
+
   @override
   void dispose() {
     bloc.dispose();
@@ -413,49 +415,96 @@ class _MePageState extends State<MePage> {
   }
 
   Stack _buildTopMenu(BuildContext context, Size screenSize) {
-    return Stack(children: <Widget>[
-      Container(
-        alignment: Alignment.topCenter,
-        width: double.infinity,
-        height: 200,
-        padding: EdgeInsets.only(bottom: 0, top: 20),
-        decoration: BoxDecoration(
-          color: Constant.MAIN_BASE_COLOR,
-          shape: BoxShape.rectangle,
-        ),
-        child: Text(
-          AppLocalizations.of(context).translate('general_label_profile'),
-          style: TextStyle(
-              color: Colors.white,
-              fontSize: (screenSize.width / 100) * 7.5,
-              fontWeight: FontWeight.bold,
-              shadows: [
-                BoxShadow(
-                  color: Colors.black,
-                  offset: const Offset(1.0, 1.0),
-                  blurRadius: 5.0,
-                  spreadRadius: 5.0,
-                ),
-              ]),
-        ),
-      ),
-      Container(
+    var scWidth = screenSize.width;
+    if (scWidth < 600) {
+      return Stack(children: <Widget>[
+        Container(
+          alignment: Alignment.topCenter,
           width: double.infinity,
           height: 200,
-          margin: EdgeInsets.only(left: 20, right: 20, top: 80),
+          padding: EdgeInsets.only(bottom: 0, top: 20),
           decoration: BoxDecoration(
-              color: Color.fromRGBO(254, 254, 254, 1),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black38,
-                  offset: const Offset(3.0, 3.0),
-                  blurRadius: 3.0,
-                  spreadRadius: 1.0,
-                ),
-              ]),
-          child: _buildStackProfileCard(screenSize)),
-    ]);
+            color: Constant.MAIN_BASE_COLOR,
+            shape: BoxShape.rectangle,
+          ),
+          child: Text(
+            AppLocalizations.of(context).translate('general_label_profile'),
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: (screenSize.width / 100) * 7.5,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  BoxShadow(
+                    color: Colors.black,
+                    offset: const Offset(1.0, 1.0),
+                    blurRadius: 5.0,
+                    spreadRadius: 5.0,
+                  ),
+                ]),
+          ),
+        ),
+        Container(
+            width: double.infinity,
+            height: 200,
+            margin: EdgeInsets.only(left: 20, right: 20, top: 80),
+            decoration: BoxDecoration(
+                color: Color.fromRGBO(254, 254, 254, 1),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black38,
+                    offset: const Offset(3.0, 3.0),
+                    blurRadius: 3.0,
+                    spreadRadius: 1.0,
+                  ),
+                ]),
+            child: _buildStackProfileCard(screenSize)),
+      ]);
+    } else {
+      return Stack(children: <Widget>[
+        Container(
+          alignment: Alignment.topCenter,
+          width: double.infinity,
+          height: 340,
+          padding: EdgeInsets.only(bottom: 0, top: 20),
+          decoration: BoxDecoration(
+            color: Constant.MAIN_BASE_COLOR,
+            shape: BoxShape.rectangle,
+          ),
+          child: Text(
+            AppLocalizations.of(context).translate('general_label_profile'),
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: (screenSize.width / 100) * 7.5,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  BoxShadow(
+                    color: Colors.black,
+                    offset: const Offset(1.0, 1.0),
+                    blurRadius: 5.0,
+                    spreadRadius: 5.0,
+                  ),
+                ]),
+          ),
+        ),
+        Container(
+            width: double.infinity,
+            height: 340,
+            margin: EdgeInsets.only(left: 40, right: 40, top: 100),
+            decoration: BoxDecoration(
+                color: Color.fromRGBO(254, 254, 254, 1),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black38,
+                    offset: const Offset(3.0, 3.0),
+                    blurRadius: 3.0,
+                    spreadRadius: 1.0,
+                  ),
+                ]),
+            child: _buildStackProfileCard(screenSize)),
+      ]);
+    }
   }
 
   Container _buildProfileMenu(Size screenSize) {
@@ -639,6 +688,7 @@ class _MePageState extends State<MePage> {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 await prefs.setBool('isLogin', false);
                 bloc.deleteAll();
+                cartBloc.deleteAll();
                 setState(() {});
               });
             },
@@ -702,8 +752,8 @@ class _MePageState extends State<MePage> {
           Container(
             width: (screenSize.width / 100) * 25,
             height: (screenSize.width / 100) * 25,
-            margin: EdgeInsets.only(bottom: 10),
-            padding: EdgeInsets.all(10),
+            margin: EdgeInsets.only(bottom: 14),
+            padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
