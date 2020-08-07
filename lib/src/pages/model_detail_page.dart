@@ -567,8 +567,10 @@ class _ModelDetailLayoutState extends State<ModelDetailLayout> {
             children: <Widget>[
               Container(
                 padding: EdgeInsets.all(screenSize.width / 10),
-                child: Image.network(
-                    Constant.MAIN_URL_ASSETS + widget.modelDetaiList.pdtImg),
+                child: (widget.modelDetaiList.pdtImg != null)
+                    ? Image.network(
+                        Constant.MAIN_URL_ASSETS + widget.modelDetaiList.pdtImg)
+                    : Image.asset('assets/images/not-found.png'),
               ),
               Positioned(
                 left: 4,
@@ -618,6 +620,8 @@ class _ModelDetailLayoutState extends State<ModelDetailLayout> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Container(
+                      width: (screenSize.width / 100) * 8,
+                      height: (screenSize.width / 100) * 8,
                       alignment: Alignment.center,
                       child: IconButton(
                         onPressed: () {
@@ -627,7 +631,6 @@ class _ModelDetailLayoutState extends State<ModelDetailLayout> {
                         icon: Icon(
                           Icons.picture_as_pdf,
                           color: Colors.red,
-                          size: (screenSize.width / 100) * 8.5,
                         ),
                       ),
                     ),
@@ -688,7 +691,7 @@ class _ModelDetailLayoutState extends State<ModelDetailLayout> {
                 ),
               ),
               alignment: Alignment.center,
-              height: 40,
+              height: (screenSize.width / 100) * 12,
               width: screenSize.width * 0.3,
               child: Text(
                 'รหัสสินค้า',
@@ -716,7 +719,7 @@ class _ModelDetailLayoutState extends State<ModelDetailLayout> {
               ),
               alignment: Alignment.center,
               width: screenSize.width * 0.3,
-              height: 40,
+              height: (screenSize.width / 100) * 12,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -750,7 +753,7 @@ class _ModelDetailLayoutState extends State<ModelDetailLayout> {
               ),
               alignment: Alignment.center,
               width: screenSize.width * 0.25,
-              height: 40,
+              height: (screenSize.width / 100) * 12,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -799,7 +802,7 @@ class _ModelDetailLayoutState extends State<ModelDetailLayout> {
                 ),
               ),
               width: screenSize.width * 0.15,
-              height: 40,
+              height: (screenSize.width / 100) * 12,
               child: Text(
                 '',
                 overflow: TextOverflow.clip,
@@ -861,7 +864,7 @@ class _ModelListDetailState extends State<ModelListDetail> {
                   ),
                 ),
                 alignment: Alignment.center,
-                height: 40,
+                height: (screenSize.width / 100) * 10,
                 width: screenSize.width * 0.3,
                 child: Text(
                   widget.modelList[i].XVSkuCode,
@@ -893,7 +896,7 @@ class _ModelListDetailState extends State<ModelListDetail> {
                 ),
                 alignment: Alignment.center,
                 width: screenSize.width * 0.3,
-                height: 40,
+                height: (screenSize.width / 100) * 10,
                 child: Text(
                   widget.modelList[i].XVPdtSpec,
                   style: TextStyle(
@@ -914,7 +917,7 @@ class _ModelListDetailState extends State<ModelListDetail> {
                 ),
                 alignment: Alignment.center,
                 width: screenSize.width * 0.25,
-                height: 40,
+                height: (screenSize.width / 100) * 10,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -945,7 +948,7 @@ class _ModelListDetailState extends State<ModelListDetail> {
                   ),
                 ),
                 width: screenSize.width * 0.15,
-                height: 40,
+                height: (screenSize.width / 100) * 10,
                 child: IconButton(
                   onPressed: () async {
                     var isLogin = await checkIsLogin();
@@ -1127,9 +1130,9 @@ class _ModalFitState extends State<ModalFit> {
                               }
                             },
                             child: Container(
-                              height: 40,
+                              height: (screenSize.width / 100) * 8,
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 4),
+                                  horizontal: 12, vertical: 1),
                               decoration: BoxDecoration(
                                 border:
                                     Border.all(color: Colors.black54, width: 1),
@@ -1150,7 +1153,7 @@ class _ModalFitState extends State<ModalFit> {
                               //showDialogInputQty();
                             },
                             child: Container(
-                              height: 40,
+                              height: (screenSize.width / 100) * 8,
                               padding: EdgeInsets.symmetric(
                                   horizontal: 24, vertical: 4),
                               decoration: BoxDecoration(
@@ -1180,9 +1183,9 @@ class _ModalFitState extends State<ModalFit> {
                               setState(() {});
                             },
                             child: Container(
-                              height: 40,
+                              height: (screenSize.width / 100) * 8,
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 4),
+                                  horizontal: 12, vertical: 1),
                               decoration: BoxDecoration(
                                 border:
                                     Border.all(color: Colors.black54, width: 1),
@@ -1225,7 +1228,7 @@ class _ModalFitState extends State<ModalFit> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Row(
+                    Column(
                       children: <Widget>[
                         Text(
                           'Model (SIZE)  ',
@@ -1233,6 +1236,7 @@ class _ModalFitState extends State<ModalFit> {
                             fontSize: (screenSize.width / 100) * 3.5,
                           ),
                           overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.left,
                         ),
                         Text(
                           widget.pdtSpec,

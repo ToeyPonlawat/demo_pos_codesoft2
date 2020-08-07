@@ -370,17 +370,7 @@ class _AccountPageState extends State<AccountPage> {
                                       twUser += '&TWUser[0][$f]=' + '';
                                       setState(() {});
 
-                                      PostRegister pr = new PostRegister(
-                                          widget.isCompany.toString(),
-                                          widget.XVCstName,
-                                          widget.XVAdsName,
-                                          widget.XVAdsPhone1,
-                                          widget.XVAdsEmail,
-                                          widget.XVAdsCountry,
-                                          widget.XVAdsProvince,
-                                          twUser,
-                                          '');
-
+                                      // ignore: non_constant_identifier_names
                                       String PnrType;
                                       (widget.isCompany)
                                           ? PnrType = '1'

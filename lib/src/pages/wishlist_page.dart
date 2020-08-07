@@ -135,7 +135,6 @@ class WishListPage extends StatefulWidget {
 class _WishListPageState extends State<WishListPage> {
   String dropdownValue = 'ความนิยม';
   String selectOrderby;
-  String _categoryName;
 
   void goRefresh() {
     setState(() {});

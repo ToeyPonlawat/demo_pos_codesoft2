@@ -15,7 +15,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:alphadealdemo/src/bloc/database_bloc.dart';
 import 'package:alphadealdemo/src/models/client.dart';
-import 'package:sqflite/sqflite.dart';
 
 var globalScreen;
 

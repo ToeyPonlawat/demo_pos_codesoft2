@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:alphadealdemo/src/models/cart.dart';
-import 'package:alphadealdemo/src/utils/constant.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:alphadealdemo/src/models/client.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:http/http.dart' as http;
 
 //// fetch Group Icon data
 //Future<List<Cart>> fetchProductGroup() async {

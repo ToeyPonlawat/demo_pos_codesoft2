@@ -9,7 +9,6 @@ import 'package:alphadealdemo/src/models/home.dart';
 import 'package:alphadealdemo/src/utils/constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sticky_headers/sticky_headers/widget.dart';
 
 var globalScreen;
 int groupCount = 0;

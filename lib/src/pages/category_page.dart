@@ -52,6 +52,7 @@ int parseWishListCount(String responseBody) {
 Future<List<ProductGroup>> fetchProductGroup() async {
   final url = Constant.MAIN_URL_SERVICES + 'pdt_group';
   final response = await http.get(url);
+
   return parseProductGroup(response.body);
 }
 
@@ -133,7 +134,6 @@ class CategoryPage extends StatefulWidget {
 class _CategoryPageState extends State<CategoryPage> {
   String dropdownValue = 'ความนิยม';
   String selectOrderby;
-  String _categoryName;
 
   @override
   void initState() {

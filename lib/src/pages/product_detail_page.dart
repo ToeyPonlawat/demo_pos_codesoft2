@@ -1,13 +1,11 @@
 import 'package:alphadealdemo/src/bloc/database_bloc.dart';
 import 'package:alphadealdemo/src/locale/app_localization.dart';
 import 'package:alphadealdemo/src/models/cart.dart';
-import 'package:alphadealdemo/src/models/home.dart';
 import 'package:alphadealdemo/src/models/product.dart';
 import 'package:alphadealdemo/src/pages/cart_page.dart';
 import 'package:alphadealdemo/src/pages/wishlist_page.dart';
 import 'package:alphadealdemo/src/services/databases.dart';
 import 'package:alphadealdemo/src/utils/constant.dart';
-import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
@@ -556,6 +554,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 }
 
+// ignore: must_be_immutable
 class ProductImageCarousel extends StatefulWidget {
   final List<ProductImage> productImageList;
   var indd = 1;
@@ -729,9 +728,9 @@ class _ProductDetailLayoutState extends State<ProductDetailLayout> {
                         }
                       },
                       child: Container(
-                        height: 40,
+                        height: (screenSize.width / 100) * 8,
                         padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 1),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black54, width: 1),
                           borderRadius: BorderRadius.only(
@@ -751,7 +750,7 @@ class _ProductDetailLayoutState extends State<ProductDetailLayout> {
                         showDialogInputQty();
                       },
                       child: Container(
-                        height: 40,
+                        height: (screenSize.width / 100) * 8,
                         padding:
                             EdgeInsets.symmetric(horizontal: 24, vertical: 4),
                         decoration: BoxDecoration(
@@ -781,9 +780,9 @@ class _ProductDetailLayoutState extends State<ProductDetailLayout> {
                         setState(() {});
                       },
                       child: Container(
-                        height: 40,
+                        height: (screenSize.width / 100) * 8,
                         padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 1),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black54, width: 1),
                           borderRadius: BorderRadius.only(
@@ -826,8 +825,8 @@ class _ProductDetailLayoutState extends State<ProductDetailLayout> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
-                width: 30,
-                height: 30,
+                width: (screenSize.width / 100) * 8,
+                height: (screenSize.width / 100) * 8,
                 child: IconButton(
                   onPressed: () {
                     launch(Uri.encodeFull(Constant.MAIN_URL_ASSETS +

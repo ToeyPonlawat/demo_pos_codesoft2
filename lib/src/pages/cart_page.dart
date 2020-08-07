@@ -549,7 +549,6 @@ class _CartShowState extends State<CartShow> {
   }
 
   void showDialogRemoveCart(String barCode, int index) {
-    TextEditingController qtyText = new TextEditingController();
     showDialog<void>(
       context: context,
       barrierDismissible: false,

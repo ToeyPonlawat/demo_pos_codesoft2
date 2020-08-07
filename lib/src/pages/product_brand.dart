@@ -85,7 +85,6 @@ class ProductBrandPage extends StatefulWidget {
 class _ProductBrandPageState extends State<ProductBrandPage> {
   String dropdownValue = 'ความนิยม';
   String selectOrderby;
-  String _categoryName;
 
   @override
   void initState() {
@@ -577,7 +576,7 @@ class _ProductBrandPageState extends State<ProductBrandPage> {
   }
 }
 
-class ProductGrid extends StatefulWidget {
+class ProductGrid extends StatelessWidget {
   final List<ProductList> productList;
 
   ProductGrid({
@@ -586,27 +585,15 @@ class ProductGrid extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ProductGridState createState() => _ProductGridState();
-}
-
-class _ProductGridState extends State<ProductGrid> {
-  Size screenSize = globalScreen;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    int row = widget.productList.length;
+    var screenSize = MediaQuery.of(context).size;
+    int row = productList.length;
 
     if (row > 0) {
       (AppLocalizations.of(context).locale.toString() == 'th')
-          ? bndName = widget.productList[0].XVBndName_th
-          : bndName = widget.productList[0].XVBndName_en;
+          ? bndName = productList[0].XVBndName_th
+          : bndName = productList[0].XVBndName_en;
     } else {
       bndName = "";
     }
@@ -640,9 +627,9 @@ class _ProductGridState extends State<ProductGrid> {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () {
-                  var isModel = widget.productList[index].XBPdtIsModel;
-                  var pdtCode = widget.productList[index].XVPdtCode;
-                  var mdlCode = widget.productList[index].XVModCode;
+                  var isModel = productList[index].XBPdtIsModel;
+                  var pdtCode = productList[index].XVPdtCode;
+                  var mdlCode = productList[index].XVModCode;
                   (isModel == '0')
                       ? Navigator.push(
                           context,
@@ -668,10 +655,10 @@ class _ProductGridState extends State<ProductGrid> {
                         Container(
                           margin: EdgeInsets.only(top: 40),
                           alignment: Alignment.center,
-                          child: (widget.productList[index].pdtImg != null)
+                          child: (productList[index].pdtImg != null)
                               ? Image.network(
                                   Constant.MAIN_URL_ASSETS +
-                                      widget.productList[index].pdtImg,
+                                      productList[index].pdtImg,
                                   fit: BoxFit.cover,
                                 )
                               : SizedBox(
@@ -682,14 +669,14 @@ class _ProductGridState extends State<ProductGrid> {
                         Positioned(
                           top: 8,
                           child: Text(
-                            widget.productList[index].XVPdtName_th,
+                            productList[index].XVPdtName_th,
                             style: TextStyle(fontSize: 10, color: Colors.black),
                           ),
                         ),
                         Positioned(
                           top: 24,
                           child: Text(
-                            widget.productList[index].XVPdtName_th,
+                            productList[index].XVPdtName_th,
                             style: TextStyle(fontSize: 10, color: Colors.black),
                           ),
                         ),

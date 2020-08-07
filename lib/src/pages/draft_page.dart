@@ -1,13 +1,11 @@
-import 'package:alphadealdemo/src/utils/constant.dart';
-import 'package:carousel_pro/carousel_pro.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sticky_headers/sticky_headers/widget.dart';
 import 'dart:math';
 
-import 'package:flutter/material.dart';
 import 'package:indexed_list_view/indexed_list_view.dart';
 
+// ignore: must_be_immutable
 class DraftPage extends StatelessWidget {
   static IndexedScrollController controller = IndexedScrollController(initialIndex: 20);
 

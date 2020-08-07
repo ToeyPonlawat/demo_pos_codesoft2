@@ -8,10 +8,10 @@ import 'package:alphadealdemo/src/pages/contact_page.dart';
 import 'package:alphadealdemo/src/pages/donut_page.dart';
 import 'package:alphadealdemo/src/pages/product_brand.dart';
 import 'package:alphadealdemo/src/pages/product_detail_page.dart';
+import 'package:alphadealdemo/src/pages/search_page.dart';
 import 'package:alphadealdemo/src/pages/subgroup_page.dart';
 import 'package:alphadealdemo/src/pages/profile_page.dart';
 import 'package:alphadealdemo/src/pages/wishlist_page.dart';
-import 'package:alphadealdemo/src/services/app_language.dart';
 import 'package:alphadealdemo/src/services/databases.dart';
 import 'package:intl/intl.dart';
 import 'package:alphadealdemo/src/models/home.dart';
@@ -20,7 +20,6 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sticky_headers/sticky_headers/widget.dart';
 import 'package:http/http.dart' as http;
@@ -85,6 +84,7 @@ List<NewProduct> parseNewProduct(String responseBody) {
 Future<List<BestSeller>> fetchBestSeller() async {
   final url = Constant.MAIN_URL_SERVICES + 'pdt_best';
   final response = await http.get(url);
+  //print(url);
   return parseBestSeller(response.body);
 }
 
@@ -116,7 +116,7 @@ Future<int> fetchWishlistCount(String cuscode) async {
 int parseWishListCount(String responseBody) {
   final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
   List<CartQuery> a =
-  parsed.map<CartQuery>((json) => CartQuery.fromJson(json)).toList();
+      parsed.map<CartQuery>((json) => CartQuery.fromJson(json)).toList();
   return a.length;
 }
 
@@ -139,6 +139,7 @@ class _HomeAppState extends State<HomeApp> {
     });
   }
 
+  // ignore: missing_return
   Widget _body() {
     switch (_selectedPage) {
       case 0:
@@ -173,7 +174,6 @@ class _HomeAppState extends State<HomeApp> {
 
   @override
   Widget build(BuildContext context) {
-    var appLanguage = Provider.of<AppLanguage>(context);
     return Scaffold(
       body: _body(),
       bottomNavigationBar: SafeArea(
@@ -315,236 +315,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  SafeArea _buildBottomNavigate(Size screenSize) {
-    var scWidth = MediaQuery.of(context).size.width;
-    var scRatio = screenSize.height / screenSize.width;
-    if (scWidth < 760) {
-      return SafeArea(
-          top: false,
-          child: Container(
-            width: double.infinity,
-            height: 100 / scRatio,
-            padding: EdgeInsets.only(left: 20, right: 20),
-            color: Constant.MAIN_BASE_COLOR,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () {
-                    _scrollController.animateTo(
-                      0.0,
-                      curve: Curves.easeOut,
-                      duration: const Duration(milliseconds: 300),
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.only(top: (screenSize.height * 0.0075)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(
-                          Icons.home,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                        Text(
-                          'หน้าหลัก',
-                          style: TextStyle(fontSize: 10, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  child: Container(
-                    padding: EdgeInsets.only(top: (screenSize.height * 0.0075)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(
-                          Icons.redeem,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                        Text(
-                          'สินค้า',
-                          style: TextStyle(fontSize: 10, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  child: Container(
-                    padding: EdgeInsets.only(top: (screenSize.height * 0.0075)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(
-                          Icons.business,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                        Text(
-                          'เกี่ยวกับเรา',
-                          style: TextStyle(fontSize: 10, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  child: Container(
-                    padding: EdgeInsets.only(top: (screenSize.height * 0.0075)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(
-                          Icons.contact_phone,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                        Text(
-                          'ติอต่อเรา',
-                          style: TextStyle(fontSize: 10, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MePage()),
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.only(top: (screenSize.height * 0.0075)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(
-                          Icons.person,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                        Text(
-                          'ฉัน',
-                          style: TextStyle(fontSize: 10, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ));
-    } else {
-      return SafeArea(
-          top: false,
-          child: Container(
-            width: double.infinity,
-            height: 80,
-            color: Constant.MAIN_BASE_COLOR,
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: screenSize.width / 5,
-                  height: 48,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Icon(
-                        Icons.home,
-                        color: Colors.white,
-                        size: 24.0,
-                      ),
-                      Text(
-                        'Home',
-                        style: TextStyle(fontSize: 12, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: screenSize.width / 5,
-                  height: 48,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Icon(
-                        Icons.redeem,
-                        color: Colors.white,
-                        size: 24.0,
-                      ),
-                      Text(
-                        'Product',
-                        style: TextStyle(fontSize: 12, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: screenSize.width / 5,
-                  height: 48,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Icon(
-                        Icons.business,
-                        color: Colors.white,
-                        size: 24.0,
-                      ),
-                      Text(
-                        'About',
-                        style: TextStyle(fontSize: 12, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: screenSize.width / 5,
-                  height: 48,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Icon(
-                        Icons.contact_phone,
-                        color: Colors.white,
-                        size: 24.0,
-                      ),
-                      Text(
-                        'Contact',
-                        style: TextStyle(fontSize: 12, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: screenSize.width / 5,
-                  height: 48,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 24.0,
-                      ),
-                      Text(
-                        'Me',
-                        style: TextStyle(fontSize: 12, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ));
-    }
-  }
-
   StickyHeader _buildStickyHeader(Size screenSize) {
     var scWidth = MediaQuery.of(context).size.width;
 
@@ -610,7 +380,8 @@ class _HomePageState extends State<HomePage> {
             height: screenSize.height * 0.025,
           ),
           _buildBrandFuture(),
-          _buildBottomBanner(),
+          _buildBottomBanner1(),
+          _buildBottomBanner2(),
           Padding(padding: EdgeInsets.only(bottom: 55)),
         ],
       ),
@@ -631,11 +402,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Padding _buildBottomBanner() {
+  Padding _buildBottomBanner2() {
     return Padding(
-      padding: const EdgeInsets.only(top: 16, bottom: 32, left: 32, right: 32),
+      padding: const EdgeInsets.only(top: 12, bottom: 32, left: 32, right: 32),
       child: Image.asset(
         'assets/images/banner2_image.png',
+      ),
+    );
+  }
+
+  Padding _buildBottomBanner1() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 32, bottom: 12, left: 32, right: 32),
+      child: Image.asset(
+        'assets/images/banner1_image.png',
       ),
     );
   }
@@ -1019,44 +799,55 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             Container(
               width: (screenSize.width * 0.74),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    width: (screenSize.width * 0.55),
-                    height: 40,
-                    decoration: BoxDecoration(border: Border.all(width: 1)),
-                    child: TextField(
-                      autofocus: false,
-                      decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          hintText: AppLocalizations.of(context)
-                              .translate('home_label_default_search'),
-                          contentPadding: EdgeInsets.only(
-                              left: 7, top: 5, right: 20, bottom: 7)),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchPage(),
                     ),
-                  ),
-                  Container(
-                    width: (screenSize.width * 0.14),
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(width: 1),
-                        top: BorderSide(width: 1),
-                        right: BorderSide(width: 1),
+                  );
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Container(
+                      width: (screenSize.width * 0.55),
+                      height: 40,
+                      decoration: BoxDecoration(border: Border.all(width: 1)),
+                      child: TextField(
+                        enabled: false,
+                        autofocus: false,
+                        decoration: InputDecoration(
+                            fillColor: Colors.white,
+                            hintText: AppLocalizations.of(context)
+                                .translate('home_label_default_search'),
+                            contentPadding: EdgeInsets.only(
+                                left: 7, top: 5, right: 20, bottom: 7)),
                       ),
-                      color: Colors.amber,
                     ),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.search,
-                        color: Colors.black,
-                        size: 30,
+                    Container(
+                      width: (screenSize.width * 0.14),
+                      height: 40,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(width: 1),
+                          top: BorderSide(width: 1),
+                          right: BorderSide(width: 1),
+                        ),
+                        color: Colors.amber,
                       ),
-                      padding: EdgeInsets.only(bottom: 0.5),
-                    ),
-                  )
-                ],
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.search,
+                          color: Colors.black,
+                          size: 30,
+                        ),
+                        padding: EdgeInsets.only(bottom: 0.5),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
             Container(
@@ -1165,46 +956,57 @@ class _HomePageState extends State<HomePage> {
               width: (screenSize.width * 0.5),
               margin: EdgeInsets.only(right: 12),
               alignment: Alignment.bottomCenter,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    width: (screenSize.width * 0.42),
-                    height: 40,
-                    decoration: BoxDecoration(border: Border.all(width: 1)),
-                    child: TextField(
-                      autofocus: false,
-                      style: TextStyle(fontSize: 16),
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        hintText: 'ชื่อสินค้า/รหัสสินค้า/ประเภทสินค้า',
-                        border: InputBorder.none,
-                        contentPadding:
-                            EdgeInsets.only(bottom: 5, left: 10, top: 5),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchPage(),
+                    ),
+                  );
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Container(
+                      width: (screenSize.width * 0.42),
+                      height: 40,
+                      decoration: BoxDecoration(border: Border.all(width: 1)),
+                      child: TextField(
+                        enabled: false,
+                        autofocus: false,
+                        style: TextStyle(fontSize: 16),
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          hintText: 'ชื่อสินค้า/รหัสสินค้า/ประเภทสินค้า',
+                          border: InputBorder.none,
+                          contentPadding:
+                              EdgeInsets.only(bottom: 5, left: 10, top: 5),
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    width: (screenSize.width * 0.08),
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(width: 1),
-                        top: BorderSide(width: 1),
-                        right: BorderSide(width: 1),
+                    Container(
+                      width: (screenSize.width * 0.08),
+                      height: 40,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(width: 1),
+                          top: BorderSide(width: 1),
+                          right: BorderSide(width: 1),
+                        ),
+                        color: Colors.amber,
                       ),
-                      color: Colors.amber,
-                    ),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.search,
-                        color: Colors.black,
-                        size: 36,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.search,
+                          color: Colors.black,
+                          size: 36,
+                        ),
+                        padding: EdgeInsets.only(bottom: 0.5),
                       ),
-                      padding: EdgeInsets.only(bottom: 0.5),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
             Container(
@@ -1408,6 +1210,7 @@ class BestSellerList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    //print(bestSellerList);
     return ListView.builder(
       itemCount: bestSellerList.length,
       scrollDirection: Axis.horizontal,
@@ -1466,10 +1269,10 @@ class BestSellerList extends StatelessWidget {
                 Container(
                   width: 75,
                   height: 75,
-                  child: Image.network(
-                    (Constant.MAIN_URL_ASSETS +
-                        bestSellerList[index].XVImgFile),
-                  ),
+                  child: (bestSellerList[index].XVImgFile != null)
+                      ? Image.network((Constant.MAIN_URL_ASSETS +
+                          bestSellerList[index].XVImgFile))
+                      : Image.asset('assets/images/not-found.png'),
                 ),
                 Container(
                   margin: EdgeInsets.only(left: 12, right: 12),
@@ -1571,10 +1374,13 @@ class NewProductList extends StatelessWidget {
                 Container(
                   width: 75,
                   height: 75,
-                  child: Image.network(
-                    (Constant.MAIN_URL_ASSETS +
-                        newProductList[index].XVImgFile),
-                  ),
+                  child: (newProductList[index].XVImgFile != null)
+                      ? Image(
+                          width: 75,
+                          height: 75,
+                          image: NetworkImage(Constant.MAIN_URL_ASSETS +
+                              newProductList[index].XVImgFile))
+                      : Image.asset('assets/images/not-found.png'),
                 ),
                 Container(
                   margin: EdgeInsets.only(left: 12, right: 12),
@@ -1930,9 +1736,9 @@ class _GroupListState extends State<GroupList> {
                             colors: [
                               Hexcolor(widget.groupList[i].XVGrpColor3),
                               Color(int.parse(
-                                  widget.groupList[i].XVGrpColor3
-                                      .substring(1, 7),
-                                  radix: 16) +
+                                      widget.groupList[i].XVGrpColor3
+                                          .substring(1, 7),
+                                      radix: 16) +
                                   0)
                             ],
                             begin: Alignment.centerLeft,
@@ -1941,7 +1747,7 @@ class _GroupListState extends State<GroupList> {
                         ),
                         child: Text(
                           AppLocalizations.of(context)
-                              .translate('general_label_group') +
+                                  .translate('general_label_group') +
                               ' ' +
                               (i + 1).toString(),
                           style: TextStyle(
@@ -2025,8 +1831,8 @@ class _GroupListState extends State<GroupList> {
                                 alignment: Alignment.bottomCenter,
                                 child: Image.network(
                                   Constant.MAIN_URL_ASSETS +
-                                      widget
-                                          .groupList[i].subgroup[index].XVImgFile,
+                                      widget.groupList[i].subgroup[index]
+                                          .XVImgFile,
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -2034,8 +1840,8 @@ class _GroupListState extends State<GroupList> {
                                 top: 8,
                                 left: 8,
                                 child: Text(
-                                  widget
-                                      .groupList[i].subgroup[index].XVSubName_th,
+                                  widget.groupList[i].subgroup[index]
+                                      .XVSubName_th,
                                   style: TextStyle(
                                       fontSize: 10,
                                       color: Hexcolor(
@@ -2046,8 +1852,8 @@ class _GroupListState extends State<GroupList> {
                                 top: 24,
                                 left: 8,
                                 child: Text(
-                                  widget
-                                      .groupList[i].subgroup[index].XVSubName_en,
+                                  widget.groupList[i].subgroup[index]
+                                      .XVSubName_en,
                                   style: TextStyle(
                                       fontSize: 10,
                                       color: Hexcolor(
